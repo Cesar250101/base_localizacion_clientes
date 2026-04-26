@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pos_config_search" model="ir.ui.view">
+        <field name="name">pos.config.search.view</field>
+        <field name="model">pos.config</field>
+        <field name="arch" type="xml">
+            <search string="Point of Sale Config">
+                <field name="name"/>
+                <field name="picking_type_id" />
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="point_of_sale.action_pos_config_kanban" model="ir.actions.act_window">
+        <field name="name">Point of Sale</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">pos.config</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('active', '=', True), ('company_id', '=', company_id)]</field>
+        <field name="context">{'company_id': allowed_company_ids[0] if allowed_company_ids else False}</field>
+        <field name="search_view_id" ref="view_pos_config_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new PoS
+            </p><p>
+                Configure at least one Point of Sale.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_config_settings_gestioo_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sale</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="101"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="integraciones" name="integraciones" string="Integraciones" data-key="base_localizacion_clientes">
+                    <h2>Integraciones</h2>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="integra_gestioo" />
+                        </div>                    
+                        <div class="o_setting_right_pane" name="envios_right_pane">
+                            <label string="Integración Gestioo" for="integra_gestioo" />
+                            <div class="text-muted">
+                                Activa la integración con Gestioo para gestionar tu taller desde Method ERP.
+                            </div>
+                        </div>
+                            <div class="col-xs-12 col-md-6 o_setting_box" id="url_remote_partners" attrs="{'invisible': [('integra_gestioo', '=', False)]}">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane" name="partners_right_pane">
+                                    <label string="Token Gestioo" for="token_gestioo"/>
+                                    <field name="token_gestioo"/>
+                                    <div class="text-muted">
+                                        Ingrese el token proporcionado por Gestioo para la integración con su sistema de gestión de taller.
+                                    </div>
+                                </div>
+                            </div>
+
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_gestioo_config" model="ir.actions.act_window">
+        <field name="name">Integraciones</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'base_localizacion_clientes'}</field>
+    </record>
+    <menuitem
+        id="menu_gestioo_config"
+        name="Integracion"
+        parent="sale.menu_sale_config"
+        sequence="0"
+        action="action_gestioo_config"
+        groups="base.group_system"
+    />
+</odoo>

@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_base_localizacion_clientes_planes,planes_erp,base_localizacion_clientes.model_base_localiazcion_clientes_planes_topes,base.group_system,1,1,1,1
+access_res_company_sales_manager,res_company_sales_manager,base.model_res_company,sales_team.group_sale_manager,1,1,1,1
+access_res_config_settings_sales_manager,res_config_settings_sales_manager,base.model_res_config_settings,sales_team.group_sale_manager,1,1,1,1
+access_account_group_custom_manager,account.group.custom.manager,model_account_group_custom,account.group_account_manager,1,1,1,1
+access_import_purchase_lines_wizard,import.purchase.lines.wizard,model_import_purchase_lines_wizard,purchase.group_purchase_user,1,1,1,1

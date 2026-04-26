@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="base_localizacion_clientes.view_company_planes_inherit_form">
+        <field name="name">base.localizacion.clientes.view.company.planes.inherit.form</field>
+        <field name="inherit_id" ref="base.view_company_form" />
+        <field name="model">res.company</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="planes_topes_id" options="{'no_create': True}" groups="base.group_system"/>
+            </xpath>
+            <xpath expr="//page" position="after">            
+                <page name="gestioo" string="Integraciones">
+
+                  <group>
+                    <group name="autenticacion" string="Datos Autenticación">    
+                        <field name="integrar_gestioo"/>                                         
+                        <field name="token_gestioo" attrs="{'invisible': [('integrar_gestioo', '=', False)]}"/>                      
+                        <field name="url_webhook_gestioo" readonly="1" attrs="{'invisible': [('integrar_gestioo', '=', False)]}"/>
+                        <label for="url_webhook_gestioo" string="Vídeo configuración Webhook" attrs="{'invisible': [('integrar_gestioo', '=', False)]}"/>
+                        <a href="https://www.youtube.com/watch?v=DIt7mNLhCDI" attrs="{'invisible': [('integrar_gestioo', '=', False)]}">https://www.youtube.com/watch?v=DIt7mNLhCDI</a>
+                    </group>
+                    <group name="taller" string="Datos Autenticación">    
+                        <field name="es_taller"/>                                         
+                    </group>
+                </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

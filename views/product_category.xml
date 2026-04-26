@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+        <!-- Formulario de categorias de productos -->
+        <record id="base_localizacion_clientes.product_category_form_view" model="ir.ui.view">
+            <field name="name">base.localizacion.clientes.product.category.form.view</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='first']" position="after">
+                    <group name="Second" col="2">
+                        <field name="company_id" class="oe_inline"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+        <!-- Filtro de caterias de productos por compania -->
+        <record id="base_localizacion_clientes.product_category_search_view" model="ir.ui.view">
+            <field name="name">base.localizacion.clientes.product.category.search.view</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="after">
+                    <separator/>
+                    <field name="company_id" invisible="1"/>
+                    <filter name="company_category" 
+                        string="Contactos de la Compañía" 
+                        domain="['|',('company_id', '=', allowed_company_ids[0]),('company_id', '=', False)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="product.product_category_action_form" model="ir.actions.act_window">
+        <field name="name">Categorias de productos</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.category</field>
+        <field name="view_mode">tree,form</field>
+        <!-- <field name="view_type">form</field> -->
+        <!-- <field name="view_id" ref="product.product_category_action_form"/> -->
+        <field name="context">{"search_default_company_category":1}</field>
+        <field name="domain">['|',('company_id', '=', allowed_company_ids[0]),('company_id', '=', False)]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to define a new product.
+            </p><p>
+                You must define a product for everything you sell, whether it's a physical product, a consumable or a service you offer to customers.
+            </p><p>
+                The product form contains information to simplify the sale process: price, notes in the quotation, accounting data, procurement methods, etc.
+            </p>
+        </field>
+        </record>        
+
+  </data>
+</odoo>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_document_inherit_localizacion"
+              inherit_id="sale.report_saleorder_document">
+
+        <!-- Vaciar el bloque address para que no aparezca en el encabezado -->
+        <xpath expr="//t[@t-set='address']" position="replace">
+            <t t-set="address"/>
+        </xpath>
+
+        <!-- Quitar bold y reducir fuente en las líneas de la orden -->
+        <xpath expr="//table[contains(@class,'o_main_table')]" position="attributes">
+            <attribute name="style">font-size: 9px; font-weight: normal; line-height: 1.2;</attribute>
+        </xpath>
+        <xpath expr="//tbody[@class='sale_tbody']" position="attributes">
+            <attribute name="style">font-weight: normal; line-height: 1.2;</attribute>
+        </xpath>
+
+        <!-- Calcular variables de columnas: SKU y si alguna descripción difiere del nombre del producto -->
+        <xpath expr="//t[@t-set='display_discount']" position="after">
+            <t t-set="display_sku" t-value="any(l.product_id.default_code for l in lines_to_report)"/>
+            <t t-set="display_description" t-value="any(l.product_id and l.name != l.product_id.name for l in lines_to_report if not l.display_type)"/>
+        </xpath>
+
+        <!-- Cabecera SKU antes de Descripción -->
+        <xpath expr="//th[@name='th_description']" position="before">
+            <th t-if="display_sku" name="th_sku" class="text-start">SKU</th>
+        </xpath>
+
+        <!-- Columna Producto: visible solo si todas las descripciones coinciden con el nombre del producto -->
+        <xpath expr="//th[@name='th_producto']" position="replace">
+            <th t-if="not display_description" name="th_producto" class="text-start">Producto</th>
+        </xpath>
+
+        <!-- Columna Descripción: visible solo si alguna descripción difiere del nombre del producto -->
+        <xpath expr="//th[@name='th_description']" position="replace">
+            <th t-if="display_description" name="th_description" class="text-start">Descripción</th>
+        </xpath>
+
+        <!-- Celda SKU en cada línea de producto -->
+        <xpath expr="//td[@name='td_name']" position="before">
+            <td t-if="display_sku" name="td_sku">
+                <span t-field="line.product_id.default_code"/>
+            </td>
+        </xpath>
+
+        <!-- Celda Producto: visible solo si todas las descripciones coinciden con el nombre del producto -->
+        <xpath expr="//td[@name='td_product_id']" position="replace">
+            <td t-if="not display_description" name="td_product_id"><span t-field="line.product_id.name"/></td>
+        </xpath>
+
+        <!-- Celda Descripción: visible solo si alguna descripción difiere del nombre del producto -->
+        <xpath expr="//td[@name='td_name']" position="replace">
+            <td t-if="display_description" name="td_name"><span t-field="line.name"/></td>
+        </xpath>
+
+        <!-- Reemplazar el bloque "Cliente:" inline (agregado por arsante)
+             por una tabla organizada con los datos del cliente -->
+        <xpath expr="//div[@id='informations']/preceding-sibling::div[1]" position="replace">
+            <div class="row mt-4 mb-2">
+                <div class="col-12">
+                    <strong>Cliente:</strong>
+                    <table class="table table-sm " style="font-size:10px;">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="text-start">Nombre</th>
+                                <th class="text-start">Dirección</th>
+                                <th class="text-start">Ciudad</th>
+                                <th class="text-start">Estado</th>
+                                <th class="text-start">País</th>
+                                <th class="text-start">RUT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span t-field="doc.partner_id.name"/></td>
+                                <td>
+                                    <span t-field="doc.partner_id.street"/>
+                                    <t t-if="doc.partner_id.street2">
+                                        , <span t-field="doc.partner_id.street2"/>
+                                    </t>
+                                </td>
+                                <td><span t-field="doc.partner_id.city"/></td>
+                                <td><span t-field="doc.partner_id.state_id"/></td>
+                                <td><span t-field="doc.partner_id.country_id"/></td>
+                                <td>
+                                    <span t-if="doc.partner_id.vat"
+                                          t-field="doc.partner_id.vat"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </xpath>
+
+    </template>
+
+    <!-- Reemplazar "Untaxed Amount" por "Monto Neto" en el resumen de totales -->
+    <template id="document_tax_totals_inherit_localizacion"
+              inherit_id="account.document_tax_totals">
+        <xpath expr="//tr[contains(@class,'o_subtotal')]/td[1]/strong" position="replace">
+            <strong t-if="subtotal['name'] == 'Untaxed Amount'">Monto Neto</strong>
+            <strong t-else="" t-esc="subtotal['name']"/>
+        </xpath>
+    </template>
+
+</odoo>

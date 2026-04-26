@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+
+        <record model="base_localiazcion_clientes.planes_topes" id="plates_topes_inicial">
+            <field name="name">Inicia</field>
+            <field name="max_dtes">30</field>
+            <field name="max_ventas">6000000</field>
+        </record>
+
+        <record model="base_localiazcion_clientes.planes_topes" id="plates_topes_2">
+            <field name="name">Emprende</field>
+            <field name="max_dtes">2000</field>
+            <field name="max_ventas">0</field>
+        </record>
+
+        <record model="base_localiazcion_clientes.planes_topes" id="plates_topes_3">
+            <field name="name">Empresa</field>
+            <field name="max_dtes">0</field>
+            <field name="max_ventas">0</field>
+        </record>
+
+        <record model="base_localiazcion_clientes.planes_topes" id="plates_topes_4">
+            <field name="name">Empresa PRO</field>
+            <field name="max_dtes">0</field>
+            <field name="max_ventas">0</field>
+        </record>
+
+
+    </data>
+</odoo>

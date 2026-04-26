@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+        <!-- Formulario de categorias de productos -->
+        <record id="base_localizacion_clientes.plates_topes" model="ir.ui.view">
+            <field name="name">base.localizacion.clientes.plates.topes</field>
+            <field name="model">base_localiazcion_clientes.planes_topes</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="name" />
+                    <field name="max_dtes" />
+                    <field name="max_ventas" />
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="base_localizacion_clientes.plates_topes_action_windows" model="ir.actions.act_window">
+        <field name="name">Planes ERP</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">base_localiazcion_clientes.planes_topes</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to define a new plan.
+            </p><p>
+                You must define a product for everything you sell, whether it's a physical product, a consumable or a service you offer to customers.
+            </p><p>
+                The product form contains information to simplify the sale process: price, notes in the quotation, accounting data, procurement methods, etc.
+            </p>
+        </field>
+        </record>        
+
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="base_localizacion_clientes.plantes_erp_menu_act" name="Planes ERP" parent="base.menu_ir_property" action="base_localizacion_clientes.plates_topes_action_windows" sequence="1"/>
+
+  </data>
+</odoo>

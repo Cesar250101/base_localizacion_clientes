@@ -1,0 +1,10 @@
+<odoo>
+    <data>
+
+        <!-- Heredar menú Ajustes para añadir grupo Administrador de Ventas -->
+        <record id="base.menu_administration" model="ir.ui.menu">
+            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View for Account Group Custom -->
+        <record id="view_account_group_custom_form" model="ir.ui.view">
+            <field name="name">account.group.custom.form</field>
+            <field name="model">account.group.custom</field>
+            <field name="arch" type="xml">
+                <form string="Agrupación de Cuentas">
+                    <sheet>
+                        <group>
+                            <field name="code"/>
+                            <field name="name"/>
+                            <field name="parent_id"/>
+                        </group>
+                        <notebook>
+                            <page string="Subgrupos">
+                                <field name="child_ids">
+                                    <tree>
+                                        <field name="code"/>
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Cuentas Contables">
+                                <field name="account_ids" options="{'no_create': True}">
+                                    <tree>
+                                        <field name="code"/>
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View for Account Group Custom -->
+        <record id="view_account_group_custom_tree" model="ir.ui.view">
+            <field name="name">account.group.custom.tree</field>
+            <field name="model">account.group.custom</field>
+            <field name="arch" type="xml">
+                <tree string="Agrupaciones de Cuentas">
+                    <field name="code"/>
+                    <field name="display_name"/>
+                    <field name="parent_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_account_group_custom" model="ir.actions.act_window">
+            <field name="name">Agrupaciones de Cuentas</field>
+            <field name="res_model">account.group.custom</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Crea una nueva agrupación de cuentas
+              </p>
+            </field>
+        </record>
+
+        <!-- Menu Item -->
+        <menuitem id="menu_account_group_custom"
+                  name="Agrupaciones de Cuentas"
+                  parent="account.account_account_menu"
+                  action="action_account_group_custom"
+                  sequence="20"/>
+
+        <!-- Inherit Account Account Form View to add the new field -->
+        <record id="view_account_form_inherit_group_custom" model="ir.ui.view">
+            <field name="name">account.account.form.inherit.group.custom</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_form"/>
+            <field name="arch" type="xml">
+                <field name="group_id" position="after">
+                    <field name="group_custom_ids" widget="many2many_tags"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
