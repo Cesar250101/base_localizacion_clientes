@@ -53,6 +53,7 @@
         # 'views/purchase_order_views.xml',
         'views/import_purchase_lines_wizard_views.xml',
         'report/report_saleorder_document.xml',
+        'views/res_partner.xml'
 
     ],
     # only loaded in demonstration mode

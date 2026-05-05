@@ -78,24 +78,9 @@
             </field>
         </record>
 
-        <record id="base_localizacion_clientes.action_contacts" model="ir.actions.act_window">
-        <field name="name">Contacts</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">res.partner</field>
-        <field name="view_mode">kanban,tree,form</field>
-        <!-- <field name="view_type">form</field> -->
-        <field name="view_id" ref="contacts.action_contacts"/>
-        <field name="context">{"search_default_company_contacts":1}</field>
-        <field name="domain">['|',('company_id', '=', allowed_company_ids[0]),('company_id', '=', False)]</field>
-        <field name="help" type="html">
-            <p class="oe_view_nocontent_create">
-                Click to define a new product.
-            </p><p>
-                You must define a product for everything you sell, whether it's a physical product, a consumable or a service you offer to customers.
-            </p><p>
-                The product form contains information to simplify the sale process: price, notes in the quotation, accounting data, procurement methods, etc.
-            </p>
-        </field>
+        <record id="contacts.action_contacts" model="ir.actions.act_window">
+            <field name="domain">[('company_id', '=', allowed_company_ids[0])]</field>
+            <field name="context">{"search_default_company_contacts": 1}</field>
         </record>        
 
   </data>
