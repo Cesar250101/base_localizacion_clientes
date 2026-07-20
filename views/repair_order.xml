@@ -28,7 +28,7 @@
     <record id="view_repair_order_form_usage_hours" model="ir.ui.view">
         <field name="name">repair.order.form.usage.hours</field>
         <field name="model">repair.order</field>
-        <field name="inherit_id" ref="repair.view_repair_order_form"/>
+        <field name="inherit_id" ref="servitk.view_repair_order_form_inherit_servitk"/>
         <field name="priority">30</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='patente']" position="replace">
