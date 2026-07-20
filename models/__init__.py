@@ -18,3 +18,6 @@ from . import pos_session
 # from . import res_config_settings
 from . import product_supplierinfo
 from . import purchase_order
+from . import repair_config
+from . import repair_order
+from . import repair_config_settings

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_repair_configuration" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.repair.configuration</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="101"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Reparaciones" string="Reparaciones"
+                     data-key="repair">
+                    <h2>Configuración de reparaciones</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <field name="company_id" invisible="1"/>
+                            <field name="repair_config_id" invisible="1"/>
+                            <div class="o_setting_left_pane">
+                                <field name="hide_repair_description"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="hide_repair_description"/>
+                                <div class="text-muted">
+                                    No muestra el campo Descripción de la reparación en las órdenes de reparación.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="show_repair_usage_hours"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="show_repair_usage_hours"/>
+                                <div class="text-muted">
+                                    Permite registrar las horas de uso de la unidad o equipo en la orden de reparación.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_repair_configuration" model="ir.actions.act_window">
+        <field name="name">Configuración de reparaciones</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'repair'}</field>
+    </record>
+
+    <menuitem id="menu_repair_configuration"
+              name="Configuración de reparaciones"
+              parent="repair.repair_menu_config"
+              action="action_repair_configuration"
+              sequence="10"
+              groups="base.group_system"/>
+</odoo>

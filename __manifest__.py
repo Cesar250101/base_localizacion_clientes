@@ -50,6 +50,7 @@
         'views/menu_inherit.xml',
         'views/pos_config_view.xml',
         'views/repair_order.xml',
+        'views/repair_config_settings_view.xml',
         # 'views/purchase_order_views.xml',
         'views/import_purchase_lines_wizard_views.xml',
         'report/report_saleorder_document.xml',
