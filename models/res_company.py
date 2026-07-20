@@ -66,6 +66,11 @@ class ResCompany(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        # Marca el contexto para que res.partner NO fuerce company_id en la
+        # dirección autocreada de la compañía nueva (ver res_partner.py). Sin esto,
+        # el partner nace con la company activa y falla el check de multi-compañía.
+        # No dependemos de que partner_company_default esté instalado.
+        self = self.with_context(creating_from_company=True)
         # Crear la compañía usando el método original
         companies = super(ResCompany, self).create(vals_list)
         # Agregar las compañías creadas a las empresas permitidas del usuario actual

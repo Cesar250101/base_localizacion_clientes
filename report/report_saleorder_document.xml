@@ -16,19 +16,23 @@
             <attribute name="style">font-weight: normal; line-height: 1.2;</attribute>
         </xpath>
 
+        <!-- Agregar el campo payment_term_id (Condición de Pago) en el bloque de informaciones -->
+        <xpath expr="//div[@id='informations']/div[p[@t-field='doc.user_id']]" position="after">
+            <div t-if="doc.payment_term_id" class="col-auto col-3 mw-100 mb-2" name="payment_term">
+                <strong>Condición de Pago:</strong>
+                <p class="m-0" t-field="doc.payment_term_id"/>
+            </div>
+        </xpath>
+
         <!-- Calcular variables de columnas: SKU y si alguna descripción difiere del nombre del producto -->
         <xpath expr="//t[@t-set='display_discount']" position="after">
             <t t-set="display_sku" t-value="any(l.product_id.default_code for l in lines_to_report)"/>
             <t t-set="display_description" t-value="any(l.product_id and l.name != l.product_id.name for l in lines_to_report if not l.display_type)"/>
         </xpath>
 
-        <!-- Cabecera SKU antes de Descripción -->
+        <!-- Cabecera SKU y Producto antes de Descripción -->
         <xpath expr="//th[@name='th_description']" position="before">
             <th t-if="display_sku" name="th_sku" class="text-start">SKU</th>
-        </xpath>
-
-        <!-- Columna Producto: visible solo si todas las descripciones coinciden con el nombre del producto -->
-        <xpath expr="//th[@name='th_producto']" position="replace">
             <th t-if="not display_description" name="th_producto" class="text-start">Producto</th>
         </xpath>
 
@@ -37,15 +41,11 @@
             <th t-if="display_description" name="th_description" class="text-start">Descripción</th>
         </xpath>
 
-        <!-- Celda SKU en cada línea de producto -->
+        <!-- Celda SKU y Producto en cada línea de producto -->
         <xpath expr="//td[@name='td_name']" position="before">
             <td t-if="display_sku" name="td_sku">
                 <span t-field="line.product_id.default_code"/>
             </td>
-        </xpath>
-
-        <!-- Celda Producto: visible solo si todas las descripciones coinciden con el nombre del producto -->
-        <xpath expr="//td[@name='td_product_id']" position="replace">
             <td t-if="not display_description" name="td_product_id"><span t-field="line.product_id.name"/></td>
         </xpath>
 

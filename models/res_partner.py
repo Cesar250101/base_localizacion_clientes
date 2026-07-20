@@ -11,7 +11,16 @@ class Partner(models.Model):
                                  ondelete='restrict',
                                  default=lambda self: self.env['res.country'].search([('name','=','Chile')], limit=1)
                                  )
-    company_id = fields.Many2one('res.company', 'Company', index=True, default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', 'Company', index=True, default=lambda self: self._default_company_id_bl())
+
+    @api.model
+    def _default_company_id_bl(self):
+        # No asignar company_id cuando el partner es la dirección de una compañía
+        # nueva (res.company.create() de este módulo setea este contexto): debe
+        # quedar en False o falla el check de multi-compañía al crear la empresa.
+        if self.env.context.get('creating_from_company'):
+            return False
+        return self.env.company
 
     def action_sync_company_from_transactions(self):
         """
@@ -94,6 +103,9 @@ class Partner(models.Model):
     #sobre escribo el metodo create para evitar que me indique la el partner_id pertenece a otra compañia
     @api.model
     def create(self, vals):
-        if not vals.get('company_id'):
+        # No forzar company_id cuando el partner se está creando como la dirección
+        # de una compañía nueva (res.company.create() setea este contexto): debe
+        # quedar en False hasta que la compañía exista, o falla el check de multi-compañía.
+        if not vals.get('company_id') and not self.env.context.get('creating_from_company'):
             vals['company_id'] = self.env.company.id
         return super(Partner, self).create(vals)
