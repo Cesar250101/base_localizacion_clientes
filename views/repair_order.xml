@@ -23,6 +23,27 @@
         </field>
     </record>
 
+    <!-- Patente is contributed by servitk.  This extension runs after that
+         view so the usage-hours control stays on the same line. -->
+    <record id="view_repair_order_form_usage_hours" model="ir.ui.view">
+        <field name="name">repair.order.form.usage.hours</field>
+        <field name="model">repair.order</field>
+        <field name="inherit_id" ref="repair.view_repair_order_form"/>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='patente']" position="replace">
+                <label for="patente" attrs="{'invisible': [('es_taller', '!=', True)]}"/>
+                <div class="o_row" attrs="{'invisible': [('es_taller', '!=', True)]}">
+                    <field name="patente" class="o_input_12ch"/>
+                    <label for="usage_hours" class="oe_inline"
+                           attrs="{'invisible': [('show_repair_usage_hours', '=', False)]}"/>
+                    <field name="usage_hours" class="o_input_8ch"
+                           attrs="{'invisible': [('show_repair_usage_hours', '=', False)]}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
     <record id="view_repair_order_tree_inherit_amount_fields" model="ir.ui.view">
         <field name="name">repair.order.tree.inherit.amount.fields</field>
         <field name="model">repair.order</field>
