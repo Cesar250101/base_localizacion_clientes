@@ -32,8 +32,8 @@
         <field name="priority">30</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='patente']" position="replace">
-                <label for="patente" attrs="{'invisible': [('es_taller', '!=', True)]}"/>
-                <div class="o_row" attrs="{'invisible': [('es_taller', '!=', True)]}">
+                <label for="patente"/>
+                <div class="o_row">
                     <field name="patente" class="o_input_12ch"/>
                     <label for="usage_hours" class="oe_inline"
                            attrs="{'invisible': [('show_repair_usage_hours', '=', False)]}"/>
