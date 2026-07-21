@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_repairorder_servitk" inherit_id="repair.report_repairorder">
+        <xpath expr="//t[@t-call='web.external_layout']" position="replace">
+            <t t-call="web.external_layout">
+                <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+                <t t-set="currency" t-value="o.currency_id or o.company_id.currency_id"/>
+                <div class="page repair-quotation">
+                    <style>
+                        .repair-quotation { font-family: Arial, sans-serif; color: #4a4f57; font-size: 10px; }
+                        .repair-quotation h1 { font-size: 25px; font-weight: normal; margin: 30px 0 12px; }
+                        .repair-quotation .repair-table { width: 100%; border-collapse: collapse; }
+                        .repair-quotation .repair-table th, .repair-quotation .repair-table td { border: 1px solid #59616b; padding: 5px 7px; vertical-align: top; }
+                        .repair-quotation .repair-table th { font-size: 10px; font-weight: bold; text-transform: uppercase; }
+                        .repair-quotation .repair-table .section td { background: #e7e9ed; font-weight: bold; }
+                        .repair-quotation .customer-table { margin-bottom: 25px; }
+                        .repair-quotation .customer-table .label { width: 18%; font-weight: bold; }
+                        .repair-quotation .customer-table .dark { background: #505966; color: white; }
+                        .repair-quotation .repair-details { width: 100%; margin: 15px 0 30px; }
+                        .repair-quotation .repair-details td { width: 25%; padding-right: 12px; vertical-align: top; }
+                        .repair-quotation .fleet-section { margin: 0 0 28px; }
+                        .repair-quotation .fleet-section-title { background: #505966; color: white; font-weight: bold; padding: 6px 8px; }
+                        .repair-quotation .fleet-section td { width: 25%; }
+                        .repair-quotation .totals { width: 32%; margin-left: auto; margin-top: 14px; }
+                        .repair-quotation .totals td { border: 1px solid #59616b; padding: 5px 7px; }
+                        .repair-quotation .totals .total { background: #505966; color: white; font-weight: bold; }
+                        .repair-quotation .notes { margin-top: 28px; white-space: pre-line; }
+                        .repair-quotation .bank-data { margin-top: 18px; }
+                    </style>
+
+                    <h1>Presupuesto de reparación n°: <span t-field="o.name"/></h1>
+
+                    <table class="repair-table customer-table">
+                        <tbody>
+                            <tr>
+                                <td class="label">Cliente :</td>
+                                <td><span t-field="o.partner_id"/></td>
+                                <td class="label">Fecha :</td>
+                                <td><span t-field="o.create_date" t-options='{"widget": "datetime"}'/></td>
+                            </tr>
+                            <tr>
+                                <td class="label">Rut :</td>
+                                <td><span t-field="o.partner_id.vat"/></td>
+                                <td class="label">Teléfono :</td>
+                                <td><span t-field="o.partner_id.phone"/></td>
+                            </tr>
+                            <tr>
+                                <td class="label">Dirección :</td>
+                                <td><span t-esc="o.partner_id.contact_address"/></td>
+                                <td class="label">Condición de Pago :</td>
+                                <td><span t-field="o.invoice_method"/></td>
+                            </tr>
+                            <tr t-if="o.patente">
+                                <td class="dark label">Patente :</td>
+                                <td class="dark" colspan="3"><span t-field="o.patente"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="repair-details">
+                        <tbody>
+                            <tr>
+                                <td><strong>Unidad:</strong><br/><span t-field="o.product_id"/></td>
+                                <td><strong>Hora M/ Hora T :</strong><br/><span t-field="o.usage_hours"/></td>
+                                <td><strong>Garantía:</strong><br/><span t-field="o.guarantee_limit"/></td>
+                                <td><strong>Fecha de impresión:</strong><br/><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="fleet-section" t-if="o.show_repair_fleet_vehicle">
+                        <div class="fleet-section-title">Datos del vehículo</div>
+                        <table class="repair-table">
+                            <tbody t-if="o.fleet_vehicle_id">
+                                <tr>
+                                    <td><strong>Vehículo:</strong><br/><span t-field="o.fleet_vehicle_id"/></td>
+                                    <td><strong>Patente:</strong><br/><span t-field="o.fleet_vehicle_id.license_plate"/></td>
+                                    <td><strong>Marca:</strong><br/><span t-field="o.fleet_vehicle_id.brand_id"/></td>
+                                    <td><strong>Modelo:</strong><br/><span t-field="o.fleet_vehicle_id.model_id"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Conductor:</strong><br/><span t-field="o.fleet_vehicle_id.driver_id"/></td>
+                                    <td><strong>Kilometraje:</strong><br/><span t-field="o.fleet_vehicle_id.odometer"/> <span t-field="o.fleet_vehicle_id.odometer_unit"/></td>
+                                    <td><strong>N° Chasis/VIN:</strong><br/><span t-field="o.fleet_vehicle_id.vin_sn"/></td>
+                                    <td><strong>Ubicación:</strong><br/><span t-field="o.fleet_vehicle_id.location"/></td>
+                                </tr>
+                            </tbody>
+                            <tbody t-else="">
+                                <tr><td colspan="4">No se ha asociado un vehículo a esta orden de reparación.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <table class="repair-table">
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th class="text-end">Cantidad</th>
+                                <th class="text-end">Unidad</th>
+                                <th class="text-end">Precio de unidad</th>
+                                <th class="text-end">Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="o.operations">
+                                <tr class="section"><td colspan="5">Repuestos</td></tr>
+                                <tr t-foreach="o.operations" t-as="line">
+                                    <td><span t-field="line.name"/></td>
+                                    <td class="text-end"><span t-field="line.product_uom_qty"/></td>
+                                    <td class="text-end"><span t-field="line.product_uom"/></td>
+                                    <td class="text-end"><span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                    <td class="text-end"><span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                </tr>
+                            </t>
+                            <t t-if="o.fees_lines">
+                                <tr class="section"><td colspan="5">Operaciones</td></tr>
+                                <tr t-foreach="o.fees_lines" t-as="line">
+                                    <td><span t-field="line.name"/></td>
+                                    <td class="text-end"><span t-field="line.product_uom_qty"/></td>
+                                    <td class="text-end"><span t-field="line.product_uom"/></td>
+                                    <td class="text-end"><span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                    <td class="text-end"><span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <table class="totals">
+                        <tbody>
+                            <tr><td><strong>Total Sin Impuestos</strong></td><td class="text-end"><span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": currency}'/></td></tr>
+                            <tr><td>Impuestos</td><td class="text-end"><span t-field="o.amount_tax" t-options='{"widget": "monetary", "display_currency": currency}'/></td></tr>
+                            <tr class="total"><td>Total</td><td class="text-end"><span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": currency}'/></td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="notes">
+                        <strong t-if="o.patente">PATENTE: <span t-field="o.patente"/></strong>
+                        <div t-if="o.description"><span t-field="o.description"/></div>
+                        <div t-if="o.quotation_notes" t-field="o.quotation_notes"/>
+                    </div>
+                    <div class="bank-data" t-if="o.company_id.partner_id.bank_ids">
+                        <strong>Datos de Transferencia Bancaria</strong><br/>
+                        <span t-field="o.company_id.partner_id.name"/> RUT: <span t-field="o.company_id.partner_id.vat"/>
+                        <t t-set="bank" t-value="o.company_id.partner_id.bank_ids[0]"/>
+                        <span> - </span><span t-field="bank.bank_id.name"/> CTA. CTE.: <span t-field="bank.acc_number"/>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

@@ -20,6 +20,11 @@ class RepairConfigSettings(models.TransientModel):
         related='repair_config_id.show_repair_usage_hours',
         readonly=False,
     )
+    integrate_fleet = fields.Boolean(
+        string='Integrar con Flota',
+        related='repair_config_id.integrate_fleet',
+        readonly=False,
+    )
 
     @api.depends('company_id')
     def _compute_repair_config_id(self):

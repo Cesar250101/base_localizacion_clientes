@@ -11,6 +11,21 @@
             <xpath expr="//field[@name='product_id']" position="after">
                 <field name="hide_repair_description" invisible="1"/>
                 <field name="show_repair_usage_hours" invisible="1"/>
+                <field name="show_repair_fleet_vehicle" invisible="1"/>
+                <field name="es_taller" invisible="1"/>
+                <label for="patente" attrs="{'invisible': [('es_taller', '!=', True)]}"/>
+                <div class="o_row" attrs="{'invisible': [('es_taller', '!=', True)]}">
+                    <field name="patente" class="o_input_12ch"/>
+                    <label for="usage_hours" class="oe_inline"
+                           attrs="{'invisible': [('show_repair_usage_hours', '=', False)]}"/>
+                    <field name="usage_hours" class="o_input_8ch"
+                           attrs="{'invisible': [('show_repair_usage_hours', '=', False)]}"/>
+                </div>
+                <field name="fleet_vehicle_id"
+                       attrs="{'invisible': [('show_repair_fleet_vehicle', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='location_id']" position="after">
+                <field name="employee_id"/>
             </xpath>
             <xpath expr="//field[@name='schedule_date']" position="replace">
                 <label for="fecha_rma"/>
@@ -28,6 +43,10 @@
         <field name="model">repair.order</field>
         <field name="inherit_id" ref="repair.view_repair_order_tree"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="es_taller" invisible="1"/>
+                <field name="patente" attrs="{'invisible': [('es_taller', '!=', True)]}"/>
+            </xpath>
             <xpath expr="//field[@name='schedule_date']" position="before">
                 <field name="fecha_rma" optional="show"/>
             </xpath>

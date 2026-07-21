@@ -35,6 +35,17 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="integrate_fleet"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="integrate_fleet"/>
+                                <div class="text-muted">
+                                    Permite asociar un vehículo de Flota a las órdenes de reparación.
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </xpath>

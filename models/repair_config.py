@@ -22,6 +22,10 @@ class RepairConfig(models.Model):
     show_repair_usage_hours = fields.Boolean(
         string='Mostrar horas de uso de la unidad o equipo',
     )
+    integrate_fleet = fields.Boolean(
+        string='Integrar con Flota',
+        help='Permite asociar un vehículo de Flota a las órdenes de reparación.',
+    )
 
     _sql_constraints = [
         (

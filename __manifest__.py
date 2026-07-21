@@ -30,10 +30,12 @@
     'crm',
     'account',
     'project',
+    'hr',
     'hr_timesheet',
     'sale',
     'purchase',
-    'repair'],
+    'repair',
+    'fleet'],
 
     # always loaded
     'data': [
@@ -51,6 +53,7 @@
         'views/pos_config_view.xml',
         'views/repair_order.xml',
         'views/repair_config_settings_view.xml',
+        'report/repair_order_report.xml',
         # 'views/purchase_order_views.xml',
         'views/import_purchase_lines_wizard_views.xml',
         'report/report_saleorder_document.xml',
