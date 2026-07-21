@@ -30,9 +30,9 @@
             <xpath expr="//field[@name='schedule_date']" position="replace">
                 <label for="fecha_rma"/>
                 <div class="o_row">
-                    <field name="fecha_rma" class="o_input_10ch"/>
+                    <field name="fecha_rma" class="o_input_12ch"/>
                     <label for="schedule_date" class="oe_inline"/>
-                    <field name="schedule_date" class="o_input_10ch"/>
+                    <field name="schedule_date" class="o_input_12ch"/>
                 </div>
             </xpath>
         </field>
