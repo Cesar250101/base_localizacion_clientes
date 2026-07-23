@@ -25,6 +25,16 @@ class RepairConfigSettings(models.TransientModel):
         related='repair_config_id.integrate_fleet',
         readonly=False,
     )
+    require_patente = fields.Boolean(
+        string='Solicitar patente',
+        related='repair_config_id.require_patente',
+        readonly=False,
+    )
+    integrate_emsin_equipos = fields.Boolean(
+        string='Integrar equipo del cliente',
+        related='repair_config_id.integrate_emsin_equipos',
+        readonly=False,
+    )
 
     @api.depends('company_id')
     def _compute_repair_config_id(self):

@@ -36,7 +36,7 @@
                                 <td class="label">Cliente :</td>
                                 <td><span t-field="o.partner_id"/></td>
                                 <td class="label">Fecha :</td>
-                                <td><span t-field="o.create_date" t-options='{"widget": "datetime"}'/></td>
+                                <td><span t-field="o.fecha_rma"/></td>
                             </tr>
                             <tr>
                                 <td class="label">Rut :</td>
@@ -87,6 +87,27 @@
                             </tbody>
                             <tbody t-else="">
                                 <tr><td colspan="4">No se ha asociado un vehículo a esta orden de reparación.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="fleet-section" t-if="o.show_repair_equipo">
+                        <div class="fleet-section-title">Datos del equipo</div>
+                        <table class="repair-table">
+                            <tbody t-if="o.equipo_id">
+                                <tr>
+                                    <td><strong>Equipo:</strong><br/><span t-field="o.equipo_id"/></td>
+                                    <td><strong>Marca:</strong><br/><span t-field="o.equipo_id.marca"/></td>
+                                    <td><strong>Modelo:</strong><br/><span t-field="o.equipo_id.modelo"/></td>
+                                    <td><strong>Patente:</strong><br/><span t-field="o.equipo_id.patente"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Serie/Nro. Interno:</strong><br/><span t-field="o.equipo_id.nro_serie"/></td>
+                                    <td><strong>Horas/Kilometros:</strong><br/><span t-field="o.equipo_id.hrs_km"/></td>
+                                </tr>
+                            </tbody>
+                            <tbody t-else="">
+                                <tr><td colspan="4">No se ha asociado un equipo a esta orden de reparación.</td></tr>
                             </tbody>
                         </table>
                     </div>

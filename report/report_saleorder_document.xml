@@ -3,10 +3,14 @@
     <template id="report_saleorder_document_inherit_localizacion"
               inherit_id="sale.report_saleorder_document">
 
-        <!-- Vaciar el bloque address para que no aparezca en el encabezado -->
-        <xpath expr="//t[@t-set='address']" position="replace">
-            <t t-set="address"/>
-        </xpath>
+        <!-- NOTA DE COMPATIBILIDAD ENTRE BASES:
+             La vista base sale.report_saleorder_document difiere entre clientes:
+             en algunas es la estándar de Odoo (bloques <t t-set="address"> e
+             <div id="informations"> activos) y en otras fue reescrita a mano y esos
+             bloques quedaron comentados (no existen como nodos). Para que esta
+             herencia cargue en TODAS las bases, aquí solo se usan anclas que existen
+             en ambas variantes: o_main_table, sale_tbody, display_discount,
+             th_description y td_name. No anclar a 'address' ni a 'informations'. -->
 
         <!-- Quitar bold y reducir fuente en las líneas de la orden -->
         <xpath expr="//table[contains(@class,'o_main_table')]" position="attributes">
@@ -16,8 +20,10 @@
             <attribute name="style">font-weight: normal; line-height: 1.2;</attribute>
         </xpath>
 
-        <!-- Agregar el campo payment_term_id (Condición de Pago) en el bloque de informaciones -->
-        <xpath expr="//div[@id='informations']/div[p[@t-field='doc.user_id']]" position="after">
+        <!-- Agregar el campo payment_term_id (Condición de Pago) encima de la tabla de
+             líneas. Se ancla a o_main_table (presente en ambas variantes) en lugar del
+             bloque 'informations', que está comentado en algunas bases. -->
+        <xpath expr="//table[contains(@class,'o_main_table')]" position="before">
             <div t-if="doc.payment_term_id" class="col-auto col-3 mw-100 mb-2" name="payment_term">
                 <strong>Condición de Pago:</strong>
                 <p class="m-0" t-field="doc.payment_term_id"/>
@@ -52,6 +58,21 @@
         <!-- Celda Descripción: visible solo si alguna descripción difiere del nombre del producto -->
         <xpath expr="//td[@name='td_name']" position="replace">
             <td t-if="display_description" name="td_name"><span t-field="line.name"/></td>
+        </xpath>
+
+    </template>
+
+    <!-- Herencias que SOLO aplican cuando la vista base es la estándar de Odoo
+         (bloques 'address' e 'informations' activos). En las bases donde la vista
+         fue reescrita a mano esos anclas no existen; por eso este template se
+         desactiva automáticamente allí mediante _desactivar_report_std_sin_anclas()
+         (ver <function> más abajo), evitando el error de carga por xpath no hallado. -->
+    <template id="report_saleorder_document_inherit_localizacion_std"
+              inherit_id="sale.report_saleorder_document" active="False">
+
+        <!-- Vaciar el bloque address para que no aparezca en el encabezado -->
+        <xpath expr="//t[@t-set='address']" position="replace">
+            <t t-set="address"/>
         </xpath>
 
         <!-- Reemplazar el bloque "Cliente:" inline (agregado por arsante)

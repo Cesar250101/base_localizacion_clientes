@@ -1,0 +1,12 @@
+<odoo>
+    <record id="view_picking_form_inherit_invoice_id" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.invoice.id</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='backorder_id']" position="after">
+                <field name="invoice_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

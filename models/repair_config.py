@@ -26,6 +26,14 @@ class RepairConfig(models.Model):
         string='Integrar con Flota',
         help='Permite asociar un vehículo de Flota a las órdenes de reparación.',
     )
+    require_patente = fields.Boolean(
+        string='Solicitar patente',
+        help='Muestra el campo Patente en las órdenes de reparación y lo hace obligatorio.',
+    )
+    integrate_emsin_equipos = fields.Boolean(
+        string='Integrar equipo del cliente',
+        help='Permite asociar un equipo del cliente a las órdenes de reparación.',
+    )
 
     _sql_constraints = [
         (

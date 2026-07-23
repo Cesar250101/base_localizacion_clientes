@@ -5,3 +5,4 @@ access_res_config_settings_sales_manager,res_config_settings_sales_manager,base.
 access_account_group_custom_manager,account.group.custom.manager,model_account_group_custom,account.group_account_manager,1,1,1,1
 access_import_purchase_lines_wizard,import.purchase.lines.wizard,model_import_purchase_lines_wizard,purchase.group_purchase_user,1,1,1,1
 access_repair_config_system,repair.config.system,model_repair_config,base.group_system,1,1,1,1
+access_emsin_equipos_user,emsin.equipos.user,model_emsin_equipos,base.group_user,1,1,1,1

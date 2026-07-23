@@ -5,6 +5,18 @@
         <field name="inherit_id" ref="repair.view_repair_order_form"/>
         <field name="priority">5</field>
         <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="state_draft" type="object" string="Cambiar a En Reparación"
+                        states="done" class="oe_highlight" data-hotkey="d"
+                        groups="mrp.group_mrp_manager"/>
+            </xpath>
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <field name="stock_picking_count" invisible="1"/>
+                <button class="oe_stat_button" type="object" name="action_view_stock_pickings"
+                        groups="mrp.group_mrp_manager" icon="fa-truck">
+                    <field string="Pickings" name="stock_picking_count" widget="statinfo"/>
+                </button>
+            </xpath>
             <xpath expr="//field[@name='description']" position="attributes">
                 <attribute name="attrs">{'invisible': [('hide_repair_description', '=', True)]}</attribute>
             </xpath>
@@ -12,17 +24,22 @@
                 <field name="hide_repair_description" invisible="1"/>
                 <field name="show_repair_usage_hours" invisible="1"/>
                 <field name="show_repair_fleet_vehicle" invisible="1"/>
+                <field name="show_patente" invisible="1"/>
+                <field name="show_repair_equipo" invisible="1"/>
                 <field name="es_taller" invisible="1"/>
-                <label for="patente" attrs="{'invisible': [('es_taller', '!=', True)]}"/>
-                <div class="o_row" attrs="{'invisible': [('es_taller', '!=', True)]}">
-                    <field name="patente" class="o_input_12ch"/>
+                <label for="patente" attrs="{'invisible': [('show_patente', '=', False)]}"/>
+                <div class="o_row" attrs="{'invisible': [('show_patente', '=', False)]}">
+                    <field name="patente" class="o_input_12ch"
+                           attrs="{'required': [('show_patente', '=', True)]}"/>
                     <label for="usage_hours" class="oe_inline"
                            attrs="{'invisible': [('show_repair_usage_hours', '=', False)]}"/>
-                    <field name="usage_hours" class="o_input_8ch"
+                    <field name="usage_hours" class="o_input_16ch"
                            attrs="{'invisible': [('show_repair_usage_hours', '=', False)]}"/>
                 </div>
                 <field name="fleet_vehicle_id"
                        attrs="{'invisible': [('show_repair_fleet_vehicle', '=', False)]}"/>
+                <field name="equipo_id"
+                       attrs="{'invisible': [('show_repair_equipo', '=', False)]}"/>
             </xpath>
             <xpath expr="//field[@name='location_id']" position="after">
                 <field name="employee_id"/>
@@ -34,6 +51,7 @@
                     <label for="schedule_date" class="oe_inline"/>
                     <field name="schedule_date" class="o_input_12ch"/>
                 </div>
+                <field name="invoice_close_date" attrs="{'invisible': [('invoice_id', '=', False)]}"/>
             </xpath>
         </field>
     </record>
@@ -44,11 +62,14 @@
         <field name="inherit_id" ref="repair.view_repair_order_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
-                <field name="es_taller" invisible="1"/>
-                <field name="patente" attrs="{'invisible': [('es_taller', '!=', True)]}"/>
+                <field name="show_patente" invisible="1"/>
+                <field name="patente" attrs="{'invisible': [('show_patente', '=', False)]}"/>
             </xpath>
             <xpath expr="//field[@name='schedule_date']" position="before">
                 <field name="fecha_rma" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='schedule_date']" position="after">
+                <field name="invoice_close_date" optional="show"/>
             </xpath>
             <xpath expr="//field[@name='state']" position="before">
                 <field name="amount_untaxed" sum="Total Untaxed" optional="show"/>
