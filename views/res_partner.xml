@@ -1,8 +1,5 @@
 <odoo>
   <data>
-
-    <odoo>
-        <data>
           <!-- model.name inherit form view -->
           <record id="base_localizacion_clientes.view_partner_latam_form" model="ir.ui.view">
             <field name="name">base.localizacion.clientes.view.partner.latam.form</field>
@@ -42,9 +39,6 @@
                 model.action_sync_company_from_transactions()
             </field>
         </record>
-
-    </data>
-      </odoo>
 
         <record id="account.res_partner_action_customer" model="ir.actions.act_window">
             <field name="name">Customers</field>
