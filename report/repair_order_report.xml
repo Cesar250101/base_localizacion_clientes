@@ -165,6 +165,9 @@
                         <t t-set="bank" t-value="o.company_id.partner_id.bank_ids[0]"/>
                         <span> - </span><span t-field="bank.bank_id.name"/> CTA. CTE.: <span t-field="bank.acc_number"/>
                     </div>
+                    <div class="terms-conditions" t-if="o.repair_terms_conditions">
+                        <span t-field="o.repair_terms_conditions"/>
+                    </div>
                 </div>
             </t>
         </xpath>

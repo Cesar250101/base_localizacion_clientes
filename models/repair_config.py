@@ -34,6 +34,9 @@ class RepairConfig(models.Model):
         string='Integrar equipo del cliente',
         help='Permite asociar un equipo del cliente a las órdenes de reparación.',
     )
+    terms_conditions = fields.Html(
+        string='Términos y condiciones',
+    )
 
     _sql_constraints = [
         (

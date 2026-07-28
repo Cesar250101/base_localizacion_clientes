@@ -68,6 +68,15 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-12 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <label for="terms_conditions"/>
+                                <div class="text-muted">
+                                    Texto de términos y condiciones que se muestra al final del reporte de impresión de la orden de reparación.
+                                </div>
+                                <field name="terms_conditions"/>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </xpath>

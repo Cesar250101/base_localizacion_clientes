@@ -35,6 +35,11 @@ class RepairConfigSettings(models.TransientModel):
         related='repair_config_id.integrate_emsin_equipos',
         readonly=False,
     )
+    terms_conditions = fields.Html(
+        string='Términos y condiciones',
+        related='repair_config_id.terms_conditions',
+        readonly=False,
+    )
 
     @api.depends('company_id')
     def _compute_repair_config_id(self):

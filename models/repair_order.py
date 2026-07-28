@@ -42,6 +42,9 @@ class RepairOrder(models.Model):
     show_repair_equipo = fields.Boolean(
         compute='_compute_repair_configuration',
     )
+    repair_terms_conditions = fields.Html(
+        compute='_compute_repair_configuration',
+    )
     equipo_id = fields.Many2one(
         'emsin.equipos',
         string='Equipo',
@@ -74,6 +77,7 @@ class RepairOrder(models.Model):
             repair.show_repair_fleet_vehicle = config.integrate_fleet
             repair.show_patente = config.require_patente
             repair.show_repair_equipo = config.integrate_emsin_equipos
+            repair.repair_terms_conditions = config.terms_conditions
 
     @api.depends('invoice_id', 'invoice_id.invoice_date')
     def _compute_invoice_close_date(self):
