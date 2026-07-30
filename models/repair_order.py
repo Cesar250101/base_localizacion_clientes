@@ -16,7 +16,12 @@ class RepairOrder(models.Model):
         string='Compañía',
         default=_get_default_company_id,
     )
-    employee_id = fields.Many2one('hr.employee', string='Empleado', required=True)
+    employee_id = fields.Many2one(
+        'hr.employee',
+        string='Empleado',
+        required=True,
+        domain="[('company_id', 'in', [False, company_id])]",
+    )
     fecha_rma = fields.Date(
         string='Fecha RMA',
         default=fields.Date.context_today,

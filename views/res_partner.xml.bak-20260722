@@ -1,0 +1,87 @@
+<odoo>
+  <data>
+
+    <odoo>
+        <data>
+          <!-- model.name inherit form view -->
+          <record id="base_localizacion_clientes.view_partner_latam_form" model="ir.ui.view">
+            <field name="name">base.localizacion.clientes.view.partner.latam.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="l10n_latam_base.view_partner_latam_form"/>
+            <field name="arch" type="xml">
+              <xpath expr="//label[@for='l10n_latam_identification_type_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//field[@name='l10n_latam_identification_type_id']/.." position="attributes">
+                <attribute name="invisible">1</attribute>
+              </xpath>
+            </field>
+          </record>
+
+          <record id="base_localizacion_clientes.view_partner_property_form" model="ir.ui.view">
+            <field name="name">base.localizacion.clientes.view.partner.property.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="account.view_partner_property_form"/>
+            <field name="arch" type="xml">
+              <xpath expr="//field[@name='property_account_payable_id']" position="after">
+                <group string="condiciones de pago">
+                    <field string="Condicion de pago de Ventas" name="property_payment_term_id" options="{'no_open': True, 'no_create': True}"/>
+                    <field string="Condicion de pago de Compras" name="property_supplier_payment_term_id" options="{'no_open': True, 'no_create': True}"/>
+                </group>
+              </xpath>
+              
+            </field>
+          </record>
+        <record id="action_sync_partner_company" model="ir.actions.server">
+            <field name="name">Sincronizar Compañía desde Transacciones</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="binding_model_id" ref="base.model_res_partner"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                model.action_sync_company_from_transactions()
+            </field>
+        </record>
+
+    </data>
+      </odoo>
+
+        <record id="account.res_partner_action_customer" model="ir.actions.act_window">
+            <field name="name">Customers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">['|',('company_id', '=', allowed_company_ids[0]),('company_id', '=', False)]</field>
+            <field name="context">{'search_default_customer': 1,'res_partner_search_mode': 'customer', 'default_is_company': True, 'default_customer_rank': 1}</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new customer in your address book
+              </p><p>
+                Odoo helps you easily track all activities related to a customer.
+              </p>
+            </field>
+        </record>
+
+        <record id="base_localizacion_clientes.view_res_partner_filter" model="ir.ui.view">
+            <field name="name">base.localizacion.clientes.view.res.partner.filter</field>
+            <field name="model">res.partner</field>
+            <!-- <field name="mode">primary</field> -->
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <separator/>
+                    <field name="company_id" invisible="1"/>
+                    <filter name="company_contacts" 
+                        string="Contactos de la Compañía" 
+                        domain="['|',('company_id', '=', allowed_company_ids[0]),('company_id', '=', False)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="contacts.action_contacts" model="ir.actions.act_window">
+            <field name="domain">[('company_id', '=', allowed_company_ids[0])]</field>
+            <field name="context">{"search_default_company_contacts": 1}</field>
+        </record>        
+
+  </data>
+</odoo>
