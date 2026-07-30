@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Agrega telefono, movil, correo y sitio web al bloque de datos de la
+        compania del layout "Boxed". Los campos ya existen en res.company
+        (related a partner_id), por lo que solo se extiende la vista.
+
+        Ojo: este layout es compartido por todos los reportes que lo usen
+        (facturas, ordenes de venta, reparaciones, etc.), asi que el cambio
+        aplica a cualquier compania configurada con el layout Boxed.
+    -->
+    <template id="external_layout_boxed_company_contact"
+              inherit_id="web.external_layout_boxed">
+        <xpath expr="//div[@name='company_address']//ul" position="inside">
+            <li t-if="company.phone">
+                <span class="fw-bold">Tel.:</span>
+                <span class="o_force_ltr" t-field="company.phone"/>
+            </li>
+            <li t-if="company.mobile">
+                <span class="fw-bold">Móvil:</span>
+                <span class="o_force_ltr" t-field="company.mobile"/>
+            </li>
+            <li t-if="company.email">
+                <span class="fw-bold">Correo:</span>
+                <span t-field="company.email"/>
+            </li>
+            <li t-if="company.website">
+                <span class="fw-bold">Web:</span>
+                <span t-field="company.website"/>
+            </li>
+        </xpath>
+    </template>
+</odoo>

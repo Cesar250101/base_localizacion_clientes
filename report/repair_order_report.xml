@@ -7,51 +7,100 @@
                 <t t-set="currency" t-value="o.currency_id or o.company_id.currency_id"/>
                 <div class="page repair-quotation">
                     <style>
-                        .repair-quotation { font-family: Arial, sans-serif; color: #4a4f57; font-size: 10px; }
-                        .repair-quotation h1 { font-size: 25px; font-weight: normal; margin: 30px 0 12px; }
+                        /* El logo del layout estandar trae style="max-height:45px" inline,
+                           por lo que se requiere !important para ampliarlo un 30% (58.5px). */
+                        .header img[alt="Logo"] { max-height: 58.5px !important; }
+
+                        .repair-quotation { font-family: "Helvetica Neue", Arial, sans-serif; color: #2f3542; font-size: 10px; line-height: 1.45; }
+
+                        .repair-quotation .doc-head { display: flex; align-items: flex-end; justify-content: space-between;
+                            border-bottom: 3px solid #1f6feb; padding-bottom: 10px; margin: 26px 0 20px; }
+                        .repair-quotation .doc-title { font-size: 26px; font-weight: 700; color: #16324f; letter-spacing: .3px; margin: 0; }
+                        .repair-quotation .doc-subtitle { font-size: 10px; color: #7b8794; text-transform: uppercase; letter-spacing: 1.6px; margin: 0 0 4px; }
+                        .repair-quotation .doc-badge { background: #16324f; color: #fff; font-size: 15px; font-weight: 700;
+                            padding: 8px 16px; border-radius: 4px; white-space: nowrap; }
+
+                        .repair-quotation .block-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.4px;
+                            color: #1f6feb; border-bottom: 1px solid #d6dde6; padding-bottom: 4px; margin: 0 0 8px; }
+
                         .repair-quotation .repair-table { width: 100%; border-collapse: collapse; }
-                        .repair-quotation .repair-table th, .repair-quotation .repair-table td { border: 1px solid #59616b; padding: 5px 7px; vertical-align: top; }
-                        .repair-quotation .repair-table th { font-size: 10px; font-weight: bold; text-transform: uppercase; }
-                        .repair-quotation .repair-table .section td { background: #e7e9ed; font-weight: bold; }
-                        .repair-quotation .customer-table { margin-bottom: 25px; }
-                        .repair-quotation .customer-table .label { width: 18%; font-weight: bold; }
-                        .repair-quotation .customer-table .dark { background: #505966; color: white; }
-                        .repair-quotation .repair-details { width: 100%; margin: 15px 0 30px; }
-                        .repair-quotation .repair-details td { width: 25%; padding-right: 12px; vertical-align: top; }
-                        .repair-quotation .fleet-section { margin: 0 0 28px; }
-                        .repair-quotation .fleet-section-title { background: #505966; color: white; font-weight: bold; padding: 6px 8px; }
+                        .repair-quotation .repair-table th, .repair-quotation .repair-table td { border: 1px solid #d6dde6; padding: 6px 9px; vertical-align: top; }
+                        .repair-quotation .repair-table th { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px;
+                            background: #16324f; color: #fff; border-color: #16324f; }
+                        .repair-quotation .repair-table tbody tr:nth-child(even) td { background: #fafbfc; }
+                        .repair-quotation .repair-table .section td { background: #eaf1fb !important; color: #16324f; font-weight: 700;
+                            text-transform: uppercase; font-size: 9px; letter-spacing: .8px; }
+
+                        .repair-quotation .customer-table { margin-bottom: 22px; }
+                        .repair-quotation .customer-table .label { width: 17%; font-weight: 700; background: #f4f6f9 !important; color: #4a5568; }
+                        .repair-quotation .customer-table .dark { background: #16324f !important; color: #fff; }
+                        .repair-quotation .customer-table .dark.label { background: #16324f !important; color: #fff; }
+
+                        .repair-quotation .repair-details { width: 100%; border-collapse: separate; border-spacing: 8px 0; margin: 0 0 26px; }
+                        .repair-quotation .repair-details td { width: 25%; background: #f4f6f9; border-left: 3px solid #1f6feb;
+                            border-radius: 3px; padding: 8px 10px; vertical-align: top; }
+                        .repair-quotation .repair-details .k { display: block; font-size: 8px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: 1px; color: #7b8794; margin-bottom: 3px; }
+                        .repair-quotation .repair-details .v { font-size: 11px; font-weight: 600; color: #16324f; }
+
+                        .repair-quotation .fleet-section { margin: 0 0 24px; }
+                        .repair-quotation .fleet-section-title { background: #16324f; color: #fff; font-weight: 700; padding: 7px 10px;
+                            text-transform: uppercase; font-size: 9px; letter-spacing: 1.2px; border-radius: 3px 3px 0 0; }
                         .repair-quotation .fleet-section td { width: 25%; }
-                        .repair-quotation .totals { width: 32%; margin-left: auto; margin-top: 14px; }
-                        .repair-quotation .totals td { border: 1px solid #59616b; padding: 5px 7px; }
-                        .repair-quotation .totals .total { background: #505966; color: white; font-weight: bold; }
-                        .repair-quotation .notes { margin-top: 28px; white-space: pre-line; }
-                        .repair-quotation .bank-data { margin-top: 18px; }
+                        .repair-quotation .fleet-section .k { display: block; font-size: 8px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: .8px; color: #7b8794; margin-bottom: 2px; }
+
+                        .repair-quotation .lines-table td { font-size: 10px; }
+                        .repair-quotation .lines-table tbody tr td:first-child { font-weight: 600; color: #16324f; }
+
+                        .repair-quotation .totals { width: 40%; margin-left: auto; margin-top: 16px; border-collapse: collapse; }
+                        .repair-quotation .totals td { border: 1px solid #d6dde6; padding: 7px 10px; }
+                        .repair-quotation .totals tr td:first-child { color: #4a5568; }
+                        .repair-quotation .totals tr td:last-child { text-align: right; font-weight: 600; color: #16324f; }
+                        .repair-quotation .totals .total td { background: #16324f; color: #fff; font-weight: 700; font-size: 13px;
+                            border-color: #16324f; }
+                        .repair-quotation .totals .total td:last-child { color: #fff; }
+
+                        .repair-quotation .notes { margin-top: 26px; white-space: pre-line; }
+                        .repair-quotation .plate-chip { display: inline-block; background: #eaf1fb; color: #16324f; border: 1px solid #c3d5f0;
+                            border-radius: 3px; padding: 4px 10px; font-weight: 700; letter-spacing: .6px; }
+                        .repair-quotation .bank-data { margin-top: 20px; background: #f4f6f9; border-left: 3px solid #1f6feb;
+                            padding: 10px 12px; border-radius: 3px; }
+                        .repair-quotation .terms-conditions { margin-top: 18px; padding-top: 10px; border-top: 1px solid #d6dde6;
+                            font-size: 8.5px; color: #7b8794; }
                     </style>
 
-                    <h1>Presupuesto de reparación n°: <span t-field="o.name"/></h1>
+                    <div class="doc-head">
+                        <div>
+                            <p class="doc-subtitle">Presupuesto de reparación</p>
+                            <h1 class="doc-title">Orden de servicio</h1>
+                        </div>
+                        <div class="doc-badge"><span t-field="o.name"/></div>
+                    </div>
 
+                    <div class="block-title">Antecedentes del cliente</div>
                     <table class="repair-table customer-table">
                         <tbody>
                             <tr>
-                                <td class="label">Cliente :</td>
+                                <td class="label">Cliente</td>
                                 <td><span t-field="o.partner_id"/></td>
-                                <td class="label">Fecha :</td>
+                                <td class="label">Fecha</td>
                                 <td><span t-field="o.fecha_rma"/></td>
                             </tr>
                             <tr>
-                                <td class="label">Rut :</td>
+                                <td class="label">Rut</td>
                                 <td><span t-field="o.partner_id.vat"/></td>
-                                <td class="label">Teléfono :</td>
+                                <td class="label">Teléfono</td>
                                 <td><span t-field="o.partner_id.phone"/></td>
                             </tr>
                             <tr>
-                                <td class="label">Dirección :</td>
+                                <td class="label">Dirección</td>
                                 <td><span t-esc="o.partner_id.contact_address"/></td>
-                                <td class="label">Condición de Pago :</td>
+                                <td class="label">Condición de Pago</td>
                                 <td><span t-field="o.invoice_method"/></td>
                             </tr>
                             <tr t-if="o.patente">
-                                <td class="dark label">Patente :</td>
+                                <td class="dark label">Patente</td>
                                 <td class="dark" colspan="3"><span t-field="o.patente"/></td>
                             </tr>
                         </tbody>
@@ -60,10 +109,10 @@
                     <table class="repair-details">
                         <tbody>
                             <tr>
-                                <td><strong>Unidad:</strong><br/><span t-field="o.product_id"/></td>
-                                <td><strong>Hora M/ Hora T :</strong><br/><span t-field="o.usage_hours"/></td>
-                                <td><strong>Garantía:</strong><br/><span t-field="o.guarantee_limit"/></td>
-                                <td><strong>Fecha de impresión:</strong><br/><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></td>
+                                <td><span class="k">Unidad</span><span class="v" t-field="o.product_id"/></td>
+                                <td><span class="k">Hora M / Hora T</span><span class="v" t-field="o.usage_hours"/></td>
+                                <td><span class="k">Garantía</span><span class="v" t-field="o.guarantee_limit"/></td>
+                                <td><span class="k">Fecha de impresión</span><span class="v" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></td>
                             </tr>
                         </tbody>
                     </table>
@@ -73,16 +122,16 @@
                         <table class="repair-table">
                             <tbody t-if="o.fleet_vehicle_id">
                                 <tr>
-                                    <td><strong>Vehículo:</strong><br/><span t-field="o.fleet_vehicle_id"/></td>
-                                    <td><strong>Patente:</strong><br/><span t-field="o.fleet_vehicle_id.license_plate"/></td>
-                                    <td><strong>Marca:</strong><br/><span t-field="o.fleet_vehicle_id.brand_id"/></td>
-                                    <td><strong>Modelo:</strong><br/><span t-field="o.fleet_vehicle_id.model_id"/></td>
+                                    <td><span class="k">Vehículo</span><span t-field="o.fleet_vehicle_id"/></td>
+                                    <td><span class="k">Patente</span><span t-field="o.fleet_vehicle_id.license_plate"/></td>
+                                    <td><span class="k">Marca</span><span t-field="o.fleet_vehicle_id.brand_id"/></td>
+                                    <td><span class="k">Modelo</span><span t-field="o.fleet_vehicle_id.model_id"/></td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Conductor:</strong><br/><span t-field="o.fleet_vehicle_id.driver_id"/></td>
-                                    <td><strong>Kilometraje:</strong><br/><span t-field="o.fleet_vehicle_id.odometer"/> <span t-field="o.fleet_vehicle_id.odometer_unit"/></td>
-                                    <td><strong>N° Chasis/VIN:</strong><br/><span t-field="o.fleet_vehicle_id.vin_sn"/></td>
-                                    <td><strong>Ubicación:</strong><br/><span t-field="o.fleet_vehicle_id.location"/></td>
+                                    <td><span class="k">Conductor</span><span t-field="o.fleet_vehicle_id.driver_id"/></td>
+                                    <td><span class="k">Kilometraje</span><span t-field="o.fleet_vehicle_id.odometer"/> <span t-field="o.fleet_vehicle_id.odometer_unit"/></td>
+                                    <td><span class="k">N° Chasis/VIN</span><span t-field="o.fleet_vehicle_id.vin_sn"/></td>
+                                    <td><span class="k">Ubicación</span><span t-field="o.fleet_vehicle_id.location"/></td>
                                 </tr>
                             </tbody>
                             <tbody t-else="">
@@ -96,14 +145,14 @@
                         <table class="repair-table">
                             <tbody t-if="o.equipo_id">
                                 <tr>
-                                    <td><strong>Equipo:</strong><br/><span t-field="o.equipo_id"/></td>
-                                    <td><strong>Marca:</strong><br/><span t-field="o.equipo_id.marca"/></td>
-                                    <td><strong>Modelo:</strong><br/><span t-field="o.equipo_id.modelo"/></td>
-                                    <td><strong>Patente:</strong><br/><span t-field="o.equipo_id.patente"/></td>
+                                    <td><span class="k">Equipo</span><span t-field="o.equipo_id"/></td>
+                                    <td><span class="k">Marca</span><span t-field="o.equipo_id.marca"/></td>
+                                    <td><span class="k">Modelo</span><span t-field="o.equipo_id.modelo"/></td>
+                                    <td><span class="k">Patente</span><span t-field="o.equipo_id.patente"/></td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Serie/Nro. Interno:</strong><br/><span t-field="o.equipo_id.nro_serie"/></td>
-                                    <td><strong>Horas/Kilometros:</strong><br/><span t-field="o.equipo_id.hrs_km"/></td>
+                                    <td><span class="k">Serie/Nro. Interno</span><span t-field="o.equipo_id.nro_serie"/></td>
+                                    <td><span class="k">Horas/Kilometros</span><span t-field="o.equipo_id.hrs_km"/></td>
                                 </tr>
                             </tbody>
                             <tbody t-else="">
@@ -112,7 +161,8 @@
                         </table>
                     </div>
 
-                    <table class="repair-table">
+                    <div class="block-title">Detalle del presupuesto</div>
+                    <table class="repair-table lines-table">
                         <thead>
                             <tr>
                                 <th>Descripción</th>
@@ -155,7 +205,7 @@
                     </table>
 
                     <div class="notes">
-                        <strong t-if="o.patente">PATENTE: <span t-field="o.patente"/></strong>
+                        <div t-if="o.patente" class="plate-chip">PATENTE: <span t-field="o.patente"/></div>
                         <div t-if="o.description"><span t-field="o.description"/></div>
                         <div t-if="o.quotation_notes" t-field="o.quotation_notes"/>
                     </div>

@@ -56,6 +56,7 @@
         'views/repair_config_settings_view.xml',
         'views/stock_picking.xml',
         'report/repair_order_report.xml',
+        'report/external_layout_boxed.xml',
         # 'views/purchase_order_views.xml',
         'views/import_purchase_lines_wizard_views.xml',
         'report/report_saleorder_document.xml',
