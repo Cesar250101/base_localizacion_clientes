@@ -13,15 +13,19 @@
 
                         .repair-quotation { font-family: "Helvetica Neue", Arial, sans-serif; color: #2f3542; font-size: 10px; line-height: 1.45; }
 
+                        /* El .page del layout estandar agrega su propio margen superior; se
+                           neutraliza para que el cuerpo quede pegado al header. */
+                        .repair-quotation.page { margin-top: 0; padding-top: 0; }
+
                         .repair-quotation .doc-head { display: flex; align-items: flex-end; justify-content: space-between;
-                            border-bottom: 3px solid #1f6feb; padding-bottom: 10px; margin: 26px 0 20px; }
-                        .repair-quotation .doc-title { font-size: 26px; font-weight: 700; color: #16324f; letter-spacing: .3px; margin: 0; }
-                        .repair-quotation .doc-subtitle { font-size: 10px; color: #7b8794; text-transform: uppercase; letter-spacing: 1.6px; margin: 0 0 4px; }
-                        .repair-quotation .doc-badge { background: #16324f; color: #fff; font-size: 15px; font-weight: 700;
-                            padding: 8px 16px; border-radius: 4px; white-space: nowrap; }
+                            border-bottom: 3px solid #1f6feb; padding-bottom: 6px; margin: 0 0 12px; }
+                        .repair-quotation .doc-title { font-size: 22px; font-weight: 700; color: #16324f; letter-spacing: .3px; margin: 0; }
+                        .repair-quotation .doc-subtitle { font-size: 9px; color: #7b8794; text-transform: uppercase; letter-spacing: 1.6px; margin: 0 0 2px; }
+                        .repair-quotation .doc-badge { background: #16324f; color: #fff; font-size: 14px; font-weight: 700;
+                            padding: 5px 14px; border-radius: 4px; white-space: nowrap; }
 
                         .repair-quotation .block-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.4px;
-                            color: #1f6feb; border-bottom: 1px solid #d6dde6; padding-bottom: 4px; margin: 0 0 8px; }
+                            color: #1f6feb; border-bottom: 1px solid #d6dde6; padding-bottom: 3px; margin: 0 0 5px; }
 
                         .repair-quotation .repair-table { width: 100%; border-collapse: collapse; }
                         .repair-quotation .repair-table th, .repair-quotation .repair-table td { border: 1px solid #d6dde6; padding: 6px 9px; vertical-align: top; }
@@ -31,24 +35,32 @@
                         .repair-quotation .repair-table .section td { background: #eaf1fb !important; color: #16324f; font-weight: 700;
                             text-transform: uppercase; font-size: 9px; letter-spacing: .8px; }
 
-                        .repair-quotation .customer-table { margin-bottom: 22px; }
+                        /* Bloques cliente/equipo compactos: menos padding y menos margen
+                           inferior para dejar mas espacio a las lineas de detalle. */
+                        .repair-quotation .customer-table { margin-bottom: 10px; }
+                        .repair-quotation .customer-table td { padding: 3px 8px; }
                         .repair-quotation .customer-table .label { width: 17%; font-weight: 700; background: #f4f6f9 !important; color: #4a5568; }
-                        .repair-quotation .customer-table .dark { background: #16324f !important; color: #fff; }
-                        .repair-quotation .customer-table .dark.label { background: #16324f !important; color: #fff; }
+                        /* El color se aplica tambien a los descendientes: t-field renderiza un
+                           span que de otro modo hereda el color oscuro del tema y queda
+                           ilegible sobre el fondo azul marino (caso Patente). */
+                        .repair-quotation .customer-table .dark,
+                        .repair-quotation .customer-table .dark * { background-color: transparent; color: #fff !important; }
+                        .repair-quotation .customer-table .dark { background: #16324f !important; }
+                        .repair-quotation .customer-table .dark.label { background: #16324f !important; }
 
-                        .repair-quotation .repair-details { width: 100%; border-collapse: separate; border-spacing: 8px 0; margin: 0 0 26px; }
+                        .repair-quotation .repair-details { width: 100%; border-collapse: separate; border-spacing: 6px 0; margin: 0 0 12px; }
                         .repair-quotation .repair-details td { width: 25%; background: #f4f6f9; border-left: 3px solid #1f6feb;
-                            border-radius: 3px; padding: 8px 10px; vertical-align: top; }
-                        .repair-quotation .repair-details .k { display: block; font-size: 8px; font-weight: 700; text-transform: uppercase;
-                            letter-spacing: 1px; color: #7b8794; margin-bottom: 3px; }
-                        .repair-quotation .repair-details .v { font-size: 11px; font-weight: 600; color: #16324f; }
+                            border-radius: 3px; padding: 4px 8px; vertical-align: top; }
+                        .repair-quotation .repair-details .k { display: block; font-size: 7.5px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: 1px; color: #7b8794; margin-bottom: 1px; }
+                        .repair-quotation .repair-details .v { font-size: 10px; font-weight: 600; color: #16324f; }
 
-                        .repair-quotation .fleet-section { margin: 0 0 24px; }
-                        .repair-quotation .fleet-section-title { background: #16324f; color: #fff; font-weight: 700; padding: 7px 10px;
+                        .repair-quotation .fleet-section { margin: 0 0 12px; }
+                        .repair-quotation .fleet-section-title { background: #16324f; color: #fff; font-weight: 700; padding: 4px 10px;
                             text-transform: uppercase; font-size: 9px; letter-spacing: 1.2px; border-radius: 3px 3px 0 0; }
-                        .repair-quotation .fleet-section td { width: 25%; }
-                        .repair-quotation .fleet-section .k { display: block; font-size: 8px; font-weight: 700; text-transform: uppercase;
-                            letter-spacing: .8px; color: #7b8794; margin-bottom: 2px; }
+                        .repair-quotation .fleet-section td { width: 25%; padding: 3px 8px; }
+                        .repair-quotation .fleet-section .k { display: block; font-size: 7.5px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: .8px; color: #7b8794; margin-bottom: 1px; }
 
                         .repair-quotation .lines-table td { font-size: 10px; }
                         .repair-quotation .lines-table tbody tr td:first-child { font-weight: 600; color: #16324f; }
@@ -61,7 +73,7 @@
                             border-color: #16324f; }
                         .repair-quotation .totals .total td:last-child { color: #fff; }
 
-                        .repair-quotation .notes { margin-top: 26px; white-space: pre-line; }
+                        .repair-quotation .notes { margin-top: 16px; white-space: pre-line; }
                         .repair-quotation .plate-chip { display: inline-block; background: #eaf1fb; color: #16324f; border: 1px solid #c3d5f0;
                             border-radius: 3px; padding: 4px 10px; font-weight: 700; letter-spacing: .6px; }
                         .repair-quotation .bank-data { margin-top: 20px; background: #f4f6f9; border-left: 3px solid #1f6feb;
@@ -79,6 +91,12 @@
                     </div>
 
                     <div class="block-title">Antecedentes del cliente</div>
+                    <!--
+                        La patente puede venir de la propia orden o, si no se cargo ahi,
+                        del equipo o del vehiculo asociado. Se resuelve antes de la tabla
+                        para que tambien este disponible en el bloque de notas.
+                    -->
+                    <t t-set="patente_doc" t-value="o.patente or (o.equipo_id and o.equipo_id.patente) or (o.fleet_vehicle_id and o.fleet_vehicle_id.license_plate)"/>
                     <table class="repair-table customer-table">
                         <tbody>
                             <tr>
@@ -99,9 +117,9 @@
                                 <td class="label">Condición de Pago</td>
                                 <td><span t-field="o.invoice_method"/></td>
                             </tr>
-                            <tr t-if="o.patente">
+                            <tr t-if="patente_doc">
                                 <td class="dark label">Patente</td>
-                                <td class="dark" colspan="3"><span t-field="o.patente"/></td>
+                                <td class="dark" colspan="3"><span t-esc="patente_doc"/></td>
                             </tr>
                         </tbody>
                     </table>
@@ -205,7 +223,7 @@
                     </table>
 
                     <div class="notes">
-                        <div t-if="o.patente" class="plate-chip">PATENTE: <span t-field="o.patente"/></div>
+                        <div t-if="patente_doc" class="plate-chip">PATENTE: <span t-esc="patente_doc"/></div>
                         <div t-if="o.description"><span t-field="o.description"/></div>
                         <div t-if="o.quotation_notes" t-field="o.quotation_notes"/>
                     </div>

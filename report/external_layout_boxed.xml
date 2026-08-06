@@ -11,14 +11,44 @@
     -->
     <template id="external_layout_boxed_company_contact"
               inherit_id="web.external_layout_boxed">
+        <!--
+            El bloque de datos de la compania (nombre, direccion, telefono, correo,
+            web) usa el tamano de fuente por defecto del layout Boxed y ocupa
+            demasiado espacio vertical en el header. Se reduce solo ese bloque
+            (no el header completo) via CSS scopeado con el id de la compania.
+        -->
+        <xpath expr="//div[@name='company_address']" position="before">
+            <style>
+                .o_boxed_header div[name='company_address'] { font-size: 9px; line-height: 1.35; }
+                .o_boxed_header .h4 { font-size: 12px; }
+            </style>
+        </xpath>
+        <!--
+            El div "pt-5" (core, antes de web.address_layout) reserva ~3rem de
+            espacio vertical entre el header y el contenido del reporte, aunque
+            address_layout no imprima nada (como en la RMA). Se reduce a un
+            margen minimo para que el cuerpo quede pegado al encabezado.
+        -->
+        <xpath expr="//div[@class='pt-5']" position="attributes">
+            <attribute name="class">pt-1</attribute>
+        </xpath>
         <xpath expr="//div[@name='company_address']//ul" position="inside">
             <li t-if="company.phone">
                 <span class="fw-bold">Tel.:</span>
                 <span class="o_force_ltr" t-field="company.phone"/>
             </li>
-            <li t-if="company.mobile">
+            <!--
+                El asistente de vista previa del layout (base.document.layout)
+                renderiza esta plantilla con 'company' apuntando al wizard, que
+                NO expone el campo 'mobile' (si expone phone/email/website).
+                Se consulta _fields antes de leerlo: getattr no esta disponible
+                en el sandbox de QWeb. Se usa t-esc porque t-field exige que el
+                campo exista en el modelo del registro.
+            -->
+            <t t-set="company_mobile" t-value="company.mobile if 'mobile' in company._fields else False"/>
+            <li t-if="company_mobile">
                 <span class="fw-bold">Móvil:</span>
-                <span class="o_force_ltr" t-field="company.mobile"/>
+                <span class="o_force_ltr" t-esc="company_mobile"/>
             </li>
             <li t-if="company.email">
                 <span class="fw-bold">Correo:</span>
