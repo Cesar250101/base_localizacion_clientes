@@ -1,6 +1,47 @@
 # -*- coding: utf-8 -*-
 
+from lxml import etree, html
+
 from odoo import _, api, fields, models
+
+
+def _as_bullet_list(value):
+    """Convierte el HTML de quotation_notes a una lista con vinetas.
+
+    El editor de Odoo genera un <p> por linea al escribir texto plano,
+    cada uno con su propio margen; eso infla el interlineado del bloque
+    de notas en el reporte de la RMA y hace que se corte a una segunda
+    hoja. Se normaliza aqui (no solo en el reporte) para que el dato
+    guardado ya quede como lista, evitando repetir la transformacion en
+    cada lugar donde se muestre el campo.
+    """
+    if not value or not value.strip():
+        return value
+
+    fragment = html.fragment_fromstring(value, create_parent='div')
+
+    # Ya es una lista (o el usuario ya escribio <ul>/<ol>): no se toca.
+    if fragment.findall('.//ul') or fragment.findall('.//ol'):
+        return value
+
+    items = []
+    for child in fragment:
+        text = child.text_content().strip() if hasattr(child, 'text_content') else ''
+        if text:
+            items.append(text)
+
+    if not items:
+        # No hay parrafos (texto suelto sin tags): usar el texto plano completo.
+        text = fragment.text_content().strip()
+        if not text:
+            return value
+        items = [text]
+
+    ul = etree.Element('ul')
+    for item in items:
+        li = etree.SubElement(ul, 'li')
+        li.text = item
+    return html.tostring(ul, encoding='unicode')
 
 
 class RepairOrder(models.Model):
@@ -64,6 +105,18 @@ class RepairOrder(models.Model):
         compute='_compute_invoice_close_date',
         store=True,
     )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('quotation_notes'):
+                vals['quotation_notes'] = _as_bullet_list(vals['quotation_notes'])
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if vals.get('quotation_notes'):
+            vals['quotation_notes'] = _as_bullet_list(vals['quotation_notes'])
+        return super().write(vals)
 
     @api.depends('company_id')
     def _compute_repair_configuration(self):

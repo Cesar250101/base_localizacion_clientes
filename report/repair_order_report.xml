@@ -73,13 +73,35 @@
                             border-color: #16324f; }
                         .repair-quotation .totals .total td:last-child { color: #fff; }
 
-                        .repair-quotation .notes { margin-top: 16px; white-space: pre-line; }
+                        .repair-quotation .notes { margin-top: 16px; white-space: pre-line; font-size: 9px; line-height: 1.35; }
+                        /*
+                            o.description y o.quotation_notes son campos Html: el editor de
+                            Odoo genera parrafos y listas con margenes propios (~10-16px c/u)
+                            que, con varias lineas, inflan el bloque de notas y empujan el
+                            resto del documento a una segunda hoja. Se comprime ese espaciado aqui.
+                        */
+                        .repair-quotation .notes p,
+                        .repair-quotation .notes ul,
+                        .repair-quotation .notes ol { margin: 0 0 2px; padding-left: 14px; }
+                        .repair-quotation .notes li { margin: 0; padding: 0; }
                         .repair-quotation .plate-chip { display: inline-block; background: #eaf1fb; color: #16324f; border: 1px solid #c3d5f0;
-                            border-radius: 3px; padding: 4px 10px; font-weight: 700; letter-spacing: .6px; }
-                        .repair-quotation .bank-data { margin-top: 20px; background: #f4f6f9; border-left: 3px solid #1f6feb;
-                            padding: 10px 12px; border-radius: 3px; }
-                        .repair-quotation .terms-conditions { margin-top: 18px; padding-top: 10px; border-top: 1px solid #d6dde6;
-                            font-size: 8.5px; color: #7b8794; }
+                            border-radius: 3px; padding: 4px 10px; font-weight: 700; letter-spacing: .6px; margin-bottom: 4px; }
+                        .repair-quotation .bank-data { margin-top: 12px; background: #f4f6f9; border-left: 3px solid #1f6feb;
+                            padding: 8px 12px; border-radius: 3px; font-size: 9px; }
+                        .repair-quotation .terms-conditions { margin-top: 10px; padding-top: 8px; border-top: 1px solid #d6dde6;
+                            font-size: 7.5px; line-height: 1.3; color: #7b8794; }
+
+                        /*
+                            Evita que wkhtmltopdf corte estos bloques a mitad de camino
+                            cuando las notas/descripcion son largas: si un bloque no
+                            entra completo en lo que queda de la hoja, se empuja entero
+                            a la pagina siguiente en lugar de partirlo.
+                        */
+                        .repair-quotation .notes,
+                        .repair-quotation .bank-data,
+                        .repair-quotation .terms-conditions,
+                        .repair-quotation .totals { page-break-inside: avoid; }
+                        .repair-quotation .lines-table tr { page-break-inside: avoid; }
                     </style>
 
                     <div class="doc-head">
