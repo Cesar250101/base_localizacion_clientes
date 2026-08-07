@@ -97,3 +97,12 @@ class ResCompany(models.Model):
         # Reactivar la regla de compañía para las listas de precios
         pricelist_company_rule.active = True
         return companies
+
+    @api.model
+    def _sync_contacts_action_domain(self):
+        action = self.env.ref('contacts.action_contacts', raise_if_not_found=False)
+        if not action:
+            return
+        companies = self.env['res.company'].search([])
+        if len(companies) == 1:
+            action.domain = "['|', ('company_id', '=', %d), ('company_id', '=', False)]" % companies.id

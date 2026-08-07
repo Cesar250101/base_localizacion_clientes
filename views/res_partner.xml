@@ -75,7 +75,8 @@
         <record id="contacts.action_contacts" model="ir.actions.act_window">
             <field name="domain">[('company_id', '=', allowed_company_ids[0])]</field>
             <field name="context">{"search_default_company_contacts": 1}</field>
-        </record>        
+        </record>
+        <function model="res.company" name="_sync_contacts_action_domain" eval="[]"/>
 
   </data>
 </odoo>
