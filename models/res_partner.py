@@ -86,14 +86,10 @@ class Partner(models.Model):
     
     @api.ondelete(at_uninstall=False)
     def _unlink_except_active_pos_session(self):
-        company_context=self.env.context.get('allowed_company_ids')
-        company=self.env['res.company'].search([('id','=',company_context[0])])
-        pos_config_list=[]
-        pos_config_ids=self.env['pos.config'].search([('company_id','=',company.id)])
-        for i in pos_config_ids:
-            pos_config_list.append(i.id)
-        running_sessions = self.env['pos.session'].sudo().search([('state', '!=', 'closed'),
-                                                                  ('config_id','in',pos_config_list)])
+        running_sessions = self.env['pos.session'].sudo().search([
+            ('state', '!=', 'closed'),
+            ('config_id.company_id', '=', self.env.company.id),
+        ])
         if running_sessions:
             raise UserError(
                 _("You cannot delete contacts while there are active PoS sessions. Close the session(s) %s first.")
