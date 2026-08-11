@@ -70,12 +70,26 @@
                         .repair-quotation .totals td { border: 1px solid #d6dde6; padding: 7px 10px; }
                         .repair-quotation .totals tr td:first-child { color: #4a5568; }
                         .repair-quotation .totals tr td:last-child { text-align: right; font-weight: 600; color: #16324f; }
-                        .repair-quotation .totals .total td { background: #16324f; font-weight: 700; font-size: 13px;
-                            border-color: #16324f; }
-                        /* La regla de la primera columna y los spans generados por el
-                           widget monetary pueden sobrescribir la herencia de color. */
+                        /*
+                            El fondo se marca !important igual que el color de texto: sin
+                            eso, el tema de Odoo (que pinta las celdas con su propio fondo
+                            claro) ganaba el fondo pero perdia el color, dejando el monto
+                            del Total en blanco sobre blanco e ilegible.
+                            Se declara background-color (no el shorthand) para que la regla
+                            apunte exactamente a la propiedad en disputa.
+                        */
+                        .repair-quotation .totals .total td { font-weight: 700; font-size: 13px;
+                            border-color: #16324f;
+                            background-color: #16324f !important;
+                            -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        /*
+                            Los spans quedan transparentes: si tambien se les pintara el
+                            fondo, el azul cubriria solo el ancho del texto en vez de la
+                            celda completa.
+                        */
                         .repair-quotation .totals .total td,
                         .repair-quotation .totals .total td * { color: #fff !important; }
+                        .repair-quotation .totals .total td * { background-color: transparent !important; }
 
                         .repair-quotation .notes { margin-top: 16px; white-space: pre-line; font-size: 9px; line-height: 1.35; }
                         /*
@@ -88,24 +102,29 @@
                         .repair-quotation .notes ul,
                         .repair-quotation .notes ol { margin: 0 0 2px; padding-left: 14px; }
                         .repair-quotation .notes li { margin: 0; padding: 0; }
-                        .repair-quotation .plate-chip { display: inline-block; background: #eaf1fb; color: #16324f; border: 1px solid #c3d5f0;
-                            border-radius: 3px; padding: 4px 10px; font-weight: 700; letter-spacing: .6px; margin-bottom: 4px; }
                         .repair-quotation .bank-data { margin-top: 12px; background: #f4f6f9; border-left: 3px solid #1f6feb;
                             padding: 8px 12px; border-radius: 3px; font-size: 9px; }
                         .repair-quotation .terms-conditions { margin-top: 10px; padding-top: 8px; border-top: 1px solid #d6dde6;
                             font-size: 7.5px; line-height: 1.3; color: #7b8794; }
 
                         /*
-                            Evita que wkhtmltopdf corte estos bloques a mitad de camino
-                            cuando las notas/descripcion son largas: si un bloque no
-                            entra completo en lo que queda de la hoja, se empuja entero
-                            a la pagina siguiente en lugar de partirlo.
+                            Solo se protegen los bloques cortos, que se ven mal partidos
+                            y siempre caben enteros en lo que queda de hoja.
+
+                            Las notas NO llevan page-break-inside: avoid a proposito: al
+                            ser un bloque unico con toda la descripcion, esa regla obligaba
+                            a wkhtmltopdf a empujarlo completo a la hoja siguiente cuando no
+                            entraba, dejando media pagina en blanco. Sin la regla, el texto
+                            fluye y solo pasa a la segunda hoja lo que realmente no cabe.
                         */
-                        .repair-quotation .notes,
                         .repair-quotation .bank-data,
                         .repair-quotation .terms-conditions,
                         .repair-quotation .totals { page-break-inside: avoid; }
+                        /* Se evita cortar una fila de detalle por la mitad, pero no se
+                           fuerza a la tabla completa a saltar de hoja. */
                         .repair-quotation .lines-table tr { page-break-inside: avoid; }
+                        /* Las viñetas se parten individualmente, nunca a mitad de renglon. */
+                        .repair-quotation .notes li { page-break-inside: avoid; }
                     </style>
 
                     <div class="doc-head">
@@ -248,8 +267,12 @@
                         </tbody>
                     </table>
 
+                    <!--
+                        La patente ya se muestra en la tabla de antecedentes y el
+                        usuario suele repetirla dentro de las notas, por lo que aqui
+                        no se vuelve a imprimir.
+                    -->
                     <div class="notes">
-                        <div t-if="patente_doc" class="plate-chip">PATENTE: <span t-esc="patente_doc"/></div>
                         <div t-if="o.description"><span t-field="o.description"/></div>
                         <div t-if="o.quotation_notes" t-field="o.quotation_notes"/>
                     </div>
