@@ -70,9 +70,12 @@
                         .repair-quotation .totals td { border: 1px solid #d6dde6; padding: 7px 10px; }
                         .repair-quotation .totals tr td:first-child { color: #4a5568; }
                         .repair-quotation .totals tr td:last-child { text-align: right; font-weight: 600; color: #16324f; }
-                        .repair-quotation .totals .total td { background: #16324f; color: #fff; font-weight: 700; font-size: 13px;
+                        .repair-quotation .totals .total td { background: #16324f; font-weight: 700; font-size: 13px;
                             border-color: #16324f; }
-                        .repair-quotation .totals .total td:last-child { color: #fff; }
+                        /* La regla de la primera columna y los spans generados por el
+                           widget monetary pueden sobrescribir la herencia de color. */
+                        .repair-quotation .totals .total td,
+                        .repair-quotation .totals .total td * { color: #fff !important; }
 
                         .repair-quotation .notes { margin-top: 16px; white-space: pre-line; font-size: 9px; line-height: 1.35; }
                         /*
