@@ -19,8 +19,36 @@
                         <label for="url_webhook_gestioo" string="Vídeo configuración Webhook" attrs="{'invisible': [('integrar_gestioo', '=', False)]}"/>
                         <a href="https://www.youtube.com/watch?v=DIt7mNLhCDI" attrs="{'invisible': [('integrar_gestioo', '=', False)]}">https://www.youtube.com/watch?v=DIt7mNLhCDI</a>
                     </group>
-                    <group name="taller" string="Datos Autenticación">    
-                        <field name="es_taller"/>                                         
+                    <group name="taller" string="Datos Autenticación">
+                        <field name="es_taller"/>
+                    </group>
+                </group>
+                <group name="matchpoint" string="MatchPoint - Boleta Automática" groups="base.group_system">
+                    <field name="matchpoint_enabled"/>
+                    <group attrs="{'invisible': [('matchpoint_enabled', '=', False)]}">
+                        <field name="matchpoint_base_url" placeholder="https://cliente.matchpoint.com.es"/>
+                        <field name="matchpoint_api_token" password="True"/>
+                        <field name="matchpoint_center_code"/>
+                        <field name="matchpoint_timeout"/>
+                        <field name="matchpoint_document_class_id" options="{'no_create': True}"/>
+                        <button name="action_matchpoint_test_connection"
+                                string="Probar conexión"
+                                type="object"
+                                class="oe_link"
+                                icon="fa-plug"/>
+                    </group>
+                    <group attrs="{'invisible': [('matchpoint_enabled', '=', False)]}">
+                        <field name="matchpoint_pos_config_id"
+                               options="{'no_create': True}"
+                               domain="[('company_id', '=', id)]"/>
+                        <field name="matchpoint_product_id"
+                               options="{'no_create': True}"
+                               domain="[('company_id', 'in', [False, id])]"/>
+                        <field name="matchpoint_payment_method_id"
+                               options="{'no_create': True}"
+                               domain="[('config_ids', '=', matchpoint_pos_config_id)]"/>
+                        <field name="matchpoint_lookback_days"/>
+                        <field name="matchpoint_last_sync"/>
                     </group>
                 </group>
                 </page>

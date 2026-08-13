@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_matchpoint_sync_wizard_form" model="ir.ui.view">
+        <field name="name">matchpoint.sync.wizard.form</field>
+        <field name="model">matchpoint.sync.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sincronizar MatchPoint">
+                <div class="alert alert-info" role="alert">
+                    Se importarán los documentos pagados del rango indicado y se
+                    emitirá el documento tributario configurado en la compañía.
+                    El rango máximo permitido por la API es de 7 días.
+                </div>
+                <group>
+                    <field name="company_id" options="{'no_create': True}"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                </group>
+                <footer>
+                    <button name="action_sync"
+                            string="Sincronizar"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancelar"
+                            special="cancel"
+                            class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_matchpoint_sync_wizard" model="ir.actions.act_window">
+        <field name="name">Sincronizar MatchPoint</field>
+        <field name="res_model">matchpoint.sync.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_matchpoint_sync"
+              name="Sincronizar MatchPoint"
+              parent="point_of_sale.menu_point_of_sale"
+              action="action_matchpoint_sync_wizard"
+              groups="base.group_system"
+              sequence="90"/>
+</odoo>

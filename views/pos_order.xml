@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_pos_order_form_matchpoint" model="ir.ui.view">
+        <field name="name">pos.order.form.matchpoint</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group name="matchpoint"
+                       string="MatchPoint"
+                       attrs="{'invisible': [('matchpoint_sale_id', '=', False)]}">
+                    <field name="matchpoint_sale_id"/>
+                    <field name="matchpoint_doc_number"/>
+                    <field name="matchpoint_sync_date"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_pos_order_tree_matchpoint" model="ir.ui.view">
+        <field name="name">pos.order.tree.matchpoint</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_order_tree"/>
+        <field name="arch" type="xml">
+            <field name="date_order" position="after">
+                <field name="matchpoint_sale_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+</odoo>

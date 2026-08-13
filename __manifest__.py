@@ -36,12 +36,17 @@
     'purchase',
     'repair',
     'fleet',
-    'l10n_latam_base'],
+    'l10n_latam_base',
+    # Requeridos por la integración MatchPoint: sii.document_class y la
+    # emisión automática del DTE en pos.order.action_pos_order_paid.
+    'l10n_cl_fe',
+    'l10n_cl_dte_point_of_sale'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'data/planes_topes.xml',
+        'data/matchpoint_cron.xml',
         'views/res_partner.xml',
         'views/templates.xml',
         'views/product_category.xml',
@@ -59,8 +64,9 @@
         'report/external_layout_boxed.xml',
         # 'views/purchase_order_views.xml',
         'views/import_purchase_lines_wizard_views.xml',
+        'views/pos_order.xml',
+        'views/matchpoint_sync_wizard_views.xml',
         'report/report_saleorder_document.xml',
-        'views/res_partner.xml',
         'views/product_template.xml'
 
     ],

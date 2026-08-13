@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from . import matchpoint_client
 from . import res_company
+from . import pos_order
 from . import product_category
 from . import product_template
 from . import res_partner

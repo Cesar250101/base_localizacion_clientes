@@ -1,5 +1,8 @@
 <odoo>
-  <data>
+  <!-- Esta vista solo oculta campos y no requiere ser recalculada en cada upgrade.
+       Revalidarla durante una actualización fuerza la cadena completa de vistas de
+       contactos, que puede contener acciones transitorias de otros módulos. -->
+  <data noupdate="1">
           <!-- model.name inherit form view -->
           <record id="base_localizacion_clientes.view_partner_latam_form" model="ir.ui.view">
             <field name="name">base.localizacion.clientes.view.partner.latam.form</field>
@@ -14,6 +17,9 @@
               </xpath>
             </field>
           </record>
+  </data>
+
+  <data noupdate="1">
 
           <record id="base_localizacion_clientes.view_partner_property_form" model="ir.ui.view">
             <field name="name">base.localizacion.clientes.view.partner.property.form</field>
@@ -29,6 +35,9 @@
               
             </field>
           </record>
+  </data>
+
+  <data>
         <record id="action_sync_partner_company" model="ir.actions.server">
             <field name="name">Sincronizar Compañía desde Transacciones</field>
             <field name="model_id" ref="base.model_res_partner"/>

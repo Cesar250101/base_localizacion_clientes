@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!--
+        La Query API de MatchPoint no ofrece webhooks, por lo que los pagos se
+        detectan consultando /api/query/sales periódicamente. Cada 30 minutos
+        son ~48 ejecuciones al día, muy por debajo de la cuota de 500
+        peticiones diarias del token.
+
+        Se instala desactivado: se activa una vez configurada la compañía.
+    -->
+    <record id="ir_cron_matchpoint_sync" model="ir.cron">
+        <field name="name">MatchPoint: sincronizar pagos y emitir boletas</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_matchpoint_sync()</field>
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="False"/>
+        <field name="doall" eval="False"/>
+    </record>
+</odoo>
