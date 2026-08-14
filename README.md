@@ -39,6 +39,8 @@ Modulo de localizacion base para clientes Method en Odoo 16. Centraliza personal
 ### Facturas (`account.move`)
 - Campo `invoice_origin` editable con tracking.
 - Validacion de topes del plan (max. DTEs y monto) al crear facturas.
+- Opción por compañía para conservar el nombre original del contacto al publicar
+  facturas, rectificativas y recibos, aunque el contacto sea renombrado después.
 
 ### Pagos (`account.payment`)
 - Filtrado de diarios por empresa activa.

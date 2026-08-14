@@ -26,6 +26,37 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
 
+                <xpath expr="//group[@id='header_left_group']/field[@name='partner_id']" position="after">
+                    <field name="invoice_partner_display_name" readonly="1"
+                           attrs="{'invisible': ['|', ('state', '=', 'draft'), ('move_type', 'not in', ('out_invoice', 'out_refund', 'out_receipt', 'in_invoice', 'in_refund', 'in_receipt'))]}"/>
+                </xpath>
+
+                <xpath expr="//group[@id='header_left_group']/field[@name='partner_id']" position="attributes">
+                    <attribute name="attrs">{'invisible': ['|', ('state', '!=', 'draft'), ('move_type', 'not in', ('out_invoice', 'out_refund', 'out_receipt', 'in_invoice', 'in_refund', 'in_receipt'))]}</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="view_move_tree_original_partner_name" model="ir.ui.view">
+            <field name="name">account.move.tree.original.partner.name</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_tree"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="original_partner_name" readonly="1" optional="show"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_invoice_tree_original_partner_name" model="ir.ui.view">
+            <field name="name">account.invoice.tree.original.partner.name</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_invoice_tree"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="original_partner_name" readonly="1" optional="show"/>
+                </field>
             </field>
         </record>
     </data>

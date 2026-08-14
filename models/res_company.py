@@ -26,6 +26,11 @@ class ResCompany(models.Model):
     _inherit = 'res.company'
 
     planes_topes_id = fields.Many2one(comodel_name='base_localiazcion_clientes.planes_topes', string='Tipo de Plan')
+    store_original_partner_name = fields.Boolean(
+        string='Conservar nombre original del contacto',
+        help='Guarda en los documentos comerciales el nombre del contacto al '
+             'momento de publicarlos.',
+    )
     integrar_gestioo = fields.Boolean(string='Integrar con Gestioo')
     token_gestioo = fields.Char(string='Token de Gestioo')
     url_webhook_gestioo = fields.Char(string='URL Webhook Gestioo', 

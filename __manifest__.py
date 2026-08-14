@@ -20,7 +20,7 @@
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Uncategorized',
-    'version': '0.3',
+    'version': '0.5',
 
     # any module necessary for this one to work correctly
     'depends': ['base',
@@ -54,6 +54,7 @@
         'views/plates_topes.xml',
         'views/res_company.xml',
         'views/account_move.xml',
+        'views/account_config_settings_view.xml',
         'views/account_group_views.xml',
         'views/menu_inherit.xml',
         'views/pos_config_view.xml',

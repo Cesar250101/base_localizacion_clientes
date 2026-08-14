@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_original_partner_name" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.original.partner.name</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='invoicing_settings']" position="inside">
+                <div class="col-12 col-lg-6 o_setting_box" id="store_original_partner_name">
+                    <div class="o_setting_left_pane">
+                        <field name="store_original_partner_name"/>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="store_original_partner_name"/>
+                        <span class="fa fa-lg fa-building-o"
+                              title="Values set here are company-specific."
+                              aria-label="Values set here are company-specific."
+                              groups="base.group_multi_company" role="img"/>
+                        <div class="text-muted">
+                            Guarda el nombre del contacto al publicar facturas,
+                            rectificativas y recibos para conservarlo si el contacto cambia después.
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

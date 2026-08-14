@@ -12,6 +12,7 @@ from . import account_group
 from . import pos_category
 from . import pos_config
 from . import account_move
+from . import account_config_settings
 from . import account_payment
 from . import crm_lead
 from . import product_product
