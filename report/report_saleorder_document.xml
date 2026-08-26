@@ -30,36 +30,39 @@
             </div>
         </xpath>
 
-        <!-- Calcular variables de columnas: SKU y si alguna descripción difiere del nombre del producto -->
-        <xpath expr="//t[@t-set='display_discount']" position="after">
-            <t t-set="display_sku" t-value="any(l.product_id.default_code for l in lines_to_report)"/>
-            <t t-set="display_description" t-value="any(l.product_id and l.name != l.product_id.name for l in lines_to_report if not l.display_type)"/>
-        </xpath>
-
-        <!-- Cabecera SKU y Producto antes de Descripción -->
+        <!-- Cabecera: dos columnas de producto siempre visibles -->
         <xpath expr="//th[@name='th_description']" position="before">
-            <th t-if="display_sku" name="th_sku" class="text-start">SKU</th>
-            <th t-if="not display_description" name="th_producto" class="text-start">Producto</th>
+            <th name="th_sku" class="text-start">SKU</th>
         </xpath>
-
-        <!-- Columna Descripción: visible solo si alguna descripción difiere del nombre del producto -->
         <xpath expr="//th[@name='th_description']" position="replace">
-            <th t-if="display_description" name="th_description" class="text-start">Descripción</th>
+            <th name="th_description" class="text-start">Producto</th>
         </xpath>
 
-        <!-- Celda SKU y Producto en cada línea de producto -->
+        <!-- Celdas: columna 1 = product.default_code, columna 2 = sale.order.line.name -->
         <xpath expr="//td[@name='td_name']" position="before">
-            <td t-if="display_sku" name="td_sku">
+            <td name="td_sku">
                 <span t-field="line.product_id.default_code"/>
             </td>
-            <td t-if="not display_description" name="td_product_id"><span t-field="line.product_id.name"/></td>
         </xpath>
-
-        <!-- Celda Descripción: visible solo si alguna descripción difiere del nombre del producto -->
         <xpath expr="//td[@name='td_name']" position="replace">
-            <td t-if="display_description" name="td_name"><span t-field="line.name"/></td>
+            <td name="td_name"><span t-field="line.name"/></td>
         </xpath>
 
+    </template>
+
+    <!-- En la base clicksale la vista base sale.report_saleorder_document fue
+         reescrita a mano y ya trae una columna "Producto" (th_producto/td_product_id
+         con line.product_id.name) antes de Descripción, duplicando la información
+         con las columnas SKU/Producto agregadas arriba. Esa columna NO existe en las
+         demás bases (emsin, taller4, PosSuiteDemo, asvetec), así que este template
+         debe permanecer inactivo por defecto (active="False") para no romper el xpath
+         ahí. Se activa automáticamente solo donde corresponda vía
+         models/ir_ui_view.py::_register_hook (comprueba si esos nombres existen en el
+         arch de la vista base antes de activar esta herencia). -->
+    <template id="report_saleorder_document_inherit_localizacion_legacy_producto"
+              inherit_id="sale.report_saleorder_document" active="False">
+        <xpath expr="//th[@name='th_producto']" position="replace"/>
+        <xpath expr="//td[@name='td_product_id']" position="replace"/>
     </template>
 
     <!-- Herencias que SOLO aplican cuando la vista base es la estándar de Odoo

@@ -63,7 +63,11 @@ The handler ingests a GestiOO "orden" JSON payload and upserts, in order: `res.p
 
 ### Sale order report override
 
-[report/report_saleorder_document.xml](report/report_saleorder_document.xml) inherits `sale.report_saleorder_document` to restructure the customer address block into a table, conditionally show an SKU column, switch between "Producto"/"Descripcion" column headers depending on whether line descriptions diverge from product names, and relabel "Untaxed Amount" to "Monto Neto." See the README's table for the full behavior list — treat that XML as the single source of truth for layout details, not the README.
+[report/report_saleorder_document.xml](report/report_saleorder_document.xml) inherits `sale.report_saleorder_document` to restructure the customer address block into a table, add two always-visible product columns (SKU = `default_code`, Producto = `line.name`), and relabel "Untaxed Amount" to "Monto Neto." See the README's table for the full behavior list — treat that XML as the single source of truth for layout details, not the README.
+
+The base `sale.report_saleorder_document` view itself is **not identical across databases** — in `clicksale` it was hand-edited (outside any module) to add an extra `th_producto`/`td_product_id` column (`line.product_id.name`) ahead of the description column; other databases (`emsin`, `taller4`, `PosSuiteDemo`, `asvetec`) use the vanilla core structure. The inert `report_saleorder_document_inherit_localizacion_std` template below is a leftover attempt at handling this kind of per-database divergence — its comment references a `_desactivar_report_std_sin_anclas()` function that was never implemented, so it's permanently `active="False"` everywhere; don't rely on it as precedent.
+
+The **working** pattern for this divergence is `report_saleorder_document_inherit_localizacion_legacy_producto` (also `active="False"` in XML) plus [models/ir_ui_view.py](models/ir_ui_view.py) `_register_hook()`, which runs on every registry load, inspects `sale.report_saleorder_document`'s raw `arch_db` for the `th_producto`/`td_product_id` node names, and flips that template's `active` flag accordingly. If you add another xpath that only applies to a subset of databases, follow this hook-based detection pattern rather than a hardcoded always-on xpath — an unconditional xpath against a node that doesn't exist in the base view breaks that entire view (and therefore all sale order/quotation printing) on every database missing the node.
 
 ### Partner merge override
 

@@ -26,3 +26,4 @@ from . import repair_equipo
 from . import repair_order
 from . import repair_config_settings
 from . import stock_picking
+from . import ir_ui_view

@@ -66,8 +66,7 @@ Herencia de `sale.report_saleorder_document` con las siguientes mejoras:
 | Mejora | Descripcion |
 |---|---|
 | **Tabla de cliente** | Reemplaza el bloque de direccion inline por una tabla organizada (Nombre, Direccion, Ciudad, Estado, Pais, RUT). |
-| **Columna SKU** | Aparece solo si al menos una linea tiene `default_code` configurado. |
-| **Columna Producto / Descripcion** | Muestra *Producto* si todas las descripciones de linea coinciden con el nombre del producto; muestra *Descripcion* si alguna difiere. |
+| **Columnas Producto (x2)** | Dos columnas siempre visibles: "SKU" muestra `default_code` del producto, "Producto" muestra el campo `name` de la linea de venta (`sale.order.line`). En bases donde la vista base trae una columna de nombre de producto extra (caso `clicksale`), se elimina automaticamente al cargar el modulo. |
 | **Estilos** | Fuente reducida (9px), sin negrita en lineas, interlineado compacto. |
 | **Totales** | "Untaxed Amount" reemplazado por "Monto Neto". |
 
