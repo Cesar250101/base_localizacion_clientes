@@ -225,41 +225,51 @@
                     </div>
 
                     <div class="block-title">Detalle del presupuesto</div>
+                    <!--
+                        report_repairorder_sin_valores (mas abajo en este mismo archivo)
+                        hace t-set="hide_repair_prices" antes de llamar a este template,
+                        para reutilizar exactamente este mismo diseno sin precios/totales.
+                        En el flujo normal (boton "Imprimir Presupuesto" / entrada
+                        "Presupuesto / Pedido") esa variable nunca se define: los nombres
+                        sueltos en QWeb compilan a values.get(...), asi que queda falsy
+                        sin lanzar error y el reporte se ve identico a como era antes.
+                    -->
+                    <t t-set="repair_lines_colspan" t-value="3 if hide_repair_prices else 5"/>
                     <table class="repair-table lines-table">
                         <thead>
                             <tr>
                                 <th>Descripción</th>
                                 <th class="text-end">Cantidad</th>
                                 <th class="text-end">Unidad</th>
-                                <th class="text-end">Precio de unidad</th>
-                                <th class="text-end">Precio</th>
+                                <th t-if="not hide_repair_prices" class="text-end">Precio de unidad</th>
+                                <th t-if="not hide_repair_prices" class="text-end">Precio</th>
                             </tr>
                         </thead>
                         <tbody>
                             <t t-if="o.operations">
-                                <tr class="section"><td colspan="5">Repuestos</td></tr>
+                                <tr class="section"><td t-att-colspan="repair_lines_colspan">Repuestos</td></tr>
                                 <tr t-foreach="o.operations" t-as="line">
                                     <td><span t-field="line.name"/></td>
                                     <td class="text-end"><span t-field="line.product_uom_qty"/></td>
                                     <td class="text-end"><span t-field="line.product_uom"/></td>
-                                    <td class="text-end"><span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
-                                    <td class="text-end"><span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                    <td t-if="not hide_repair_prices" class="text-end"><span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                    <td t-if="not hide_repair_prices" class="text-end"><span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
                                 </tr>
                             </t>
                             <t t-if="o.fees_lines">
-                                <tr class="section"><td colspan="5">Operaciones</td></tr>
+                                <tr class="section"><td t-att-colspan="repair_lines_colspan">Operaciones</td></tr>
                                 <tr t-foreach="o.fees_lines" t-as="line">
                                     <td><span t-field="line.name"/></td>
                                     <td class="text-end"><span t-field="line.product_uom_qty"/></td>
                                     <td class="text-end"><span t-field="line.product_uom"/></td>
-                                    <td class="text-end"><span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
-                                    <td class="text-end"><span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                    <td t-if="not hide_repair_prices" class="text-end"><span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                    <td t-if="not hide_repair_prices" class="text-end"><span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
                                 </tr>
                             </t>
                         </tbody>
                     </table>
 
-                    <table class="totals">
+                    <table class="totals" t-if="not hide_repair_prices">
                         <tbody>
                             <tr><td><strong>Total Sin Impuestos</strong></td><td class="text-end"><span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": currency}'/></td></tr>
                             <tr><td>Impuestos</td><td class="text-end"><span t-field="o.amount_tax" t-options='{"widget": "monetary", "display_currency": currency}'/></td></tr>
@@ -289,4 +299,32 @@
             </t>
         </xpath>
     </template>
+
+    <!--
+        Segunda opcion de impresion pedida por el usuario: el mismo reporte de
+        la orden de reparacion (report_repairorder_servitk de arriba), pero sin
+        montos. Se implementa como un wrapper calcado de repair.report_repairorder2
+        (el mismo loop t-foreach docs del core) que solo agrega
+        t-set="hide_repair_prices" antes de llamar al template compartido, para
+        no duplicar el diseno/CSS del reporte.
+    -->
+    <template id="report_repairorder_sin_valores">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="hide_repair_prices" t-value="True"/>
+                <t t-call="repair.report_repairorder" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_repair_order_sin_valores" model="ir.actions.report">
+        <field name="name">RMA sin Valores</field>
+        <field name="model">repair.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">base_localizacion_clientes.report_repairorder_sin_valores</field>
+        <field name="report_file">base_localizacion_clientes.report_repairorder_sin_valores</field>
+        <field name="print_report_name">'RMA sin Valores - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="repair.model_repair_order"/>
+        <field name="binding_type">report</field>
+    </record>
 </odoo>
