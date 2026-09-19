@@ -39,6 +39,17 @@ class ResCompany(models.Model):
 
     es_taller = fields.Boolean(string='Es Taller')
 
+    # Interruptor maestro de funcionalidades de Compras Method (BASELOCCLI-002).
+    # Expuesto como related en res.config.settings (purchase_config_settings.py)
+    # y consumido como gate/condición por features de Compras posteriores.
+    activar_funcionalidades_compras_method = fields.Boolean(
+        string='Activar funcionalidades de Compras (Method)',
+        default=False,
+        help='Interruptor maestro: al activarlo se muestran las funcionalidades '
+             'y campos de compras que Method desarrolle desde ahora en este '
+             'módulo. En falso, esas funcionalidades permanecen ocultas.',
+    )
+
     # --- Integración MatchPoint (Query API) ---------------------------------
     # La API de MatchPoint es de solo lectura (solo endpoints GET, sin webhooks),
     # por lo que la sincronización se hace con el cron _cron_matchpoint_sync.

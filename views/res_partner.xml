@@ -88,4 +88,26 @@
         <function model="res.company" name="_sync_contacts_action_domain" eval="[]"/>
 
   </data>
+
+  <!-- Hacer editable el campo "Tipo de contacto" (res.partner.type) en el
+       formulario de contacto. La vista base base.view_partner_form lo deja en
+       solo lectura cuando el contacto está vinculado a un usuario
+       (attrs readonly [('user_ids','!=',[])]), lo que impide reclasificar
+       contactos como "Dirección de factura" / "Dirección de entrega", etc.
+       (caso reportado: contacto 992 "Caja 2 siresa", vinculado al usuario
+       siresaventaventa@gmail.com). Se quita únicamente esa condición
+       readonly, conservando invisible para empresas (is_company=True) y
+       required para individuos (comportamiento base intacto en el resto). -->
+  <data>
+      <record id="view_partner_form_editable_type" model="ir.ui.view">
+          <field name="name">res.partner.form.editable.type</field>
+          <field name="model">res.partner</field>
+          <field name="inherit_id" ref="base.view_partner_form"/>
+          <field name="arch" type="xml">
+              <xpath expr="//span[@name='address_name']/field[@name='type']" position="attributes">
+                  <attribute name="attrs">{'invisible': [('is_company','=', True)], 'required': [('is_company','!=', True)]}</attribute>
+              </xpath>
+          </field>
+      </record>
+  </data>
 </odoo>

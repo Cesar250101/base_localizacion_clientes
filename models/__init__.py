@@ -19,6 +19,7 @@ from . import product_product
 from . import pos_session
 # from . import res_currency
 # from . import res_config_settings
+from . import purchase_config_settings
 from . import product_supplierinfo
 from . import purchase_order
 from . import repair_config

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============================================================
+             BASELOCCLI-005: Logística Locales
+             Menús bajo Inventario para gestión de reposición de locales.
+             Visibles únicamente para usuarios con rol Responsable de Compras
+             (purchase.group_purchase_manager).
+             La visibilidad adicional por el flag activar_funcionalidades_compras_method
+             de res.company se aplica a través del grupo indicado; cuando el
+             administrador activa la opción "Funcionalidades de Compras (Method)"
+             en Ajustes > Compras debe asegurarse de que los usuarios del
+             flujo tengan el grupo purchase.group_purchase_manager.
+             ============================================================ -->
+
+        <!-- ── Acción: Órdenes de Compra (Reposición Locales) ────────── -->
+        <record id="action_logistica_locales_reposicion_compras" model="ir.actions.act_window">
+            <field name="name">Reposición Locales</field>
+            <field name="res_model">purchase.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{'default_state': 'draft'}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Cree una nueva orden de compra para reponer inventario en los locales.
+                </p>
+                <p>
+                    Desde aquí puede ingresar, confirmar y hacer seguimiento de las
+                    órdenes de compra destinadas a la reposición de los locales.
+                </p>
+            </field>
+        </record>
+
+
+        <!-- ── Acción: Acuerdos de Compra ─────────────────────────────── -->
+        <record id="action_logistica_locales_acuerdos_compra" model="ir.actions.act_window">
+            <field name="name">Acuerdos de Compra</field>
+            <field name="res_model">purchase.requisition</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Cree un nuevo acuerdo de compra para gestionar contratos marco con proveedores.
+                </p>
+                <p>
+                    Los acuerdos de compra permiten negociar precios y condiciones con
+                    proveedores y generar órdenes de compra a partir de ellos.
+                </p>
+            </field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════════
+             Estructura de menús
+             ══════════════════════════════════════════════════════════════ -->
+
+        <!-- Raíz: Logística Locales — hijo de Inventario -->
+        <menuitem
+            id="menu_logistica_locales_root"
+            name="Logística Locales"
+            parent="stock.menu_stock_root"
+            groups="purchase.group_purchase_manager"
+            sequence="99"
+        />
+
+        <!-- Nivel 1: Bodega Central (agrupador sin acción) -->
+        <menuitem
+            id="menu_logistica_locales_bodega_central"
+            name="Bodega Central"
+            parent="menu_logistica_locales_root"
+            groups="purchase.group_purchase_manager"
+            sequence="10"
+        />
+
+        <!-- Nivel 2a: Reposición Locales → purchase.order -->
+        <menuitem
+            id="menu_logistica_locales_reposicion_locales"
+            name="Reposición Locales"
+            parent="menu_logistica_locales_bodega_central"
+            action="action_logistica_locales_reposicion_compras"
+            groups="purchase.group_purchase_manager"
+            sequence="10"
+        />
+
+        <!-- Nivel 2b: Acuerdos de Compra → purchase.requisition -->
+        <menuitem
+            id="menu_logistica_locales_acuerdos_compra"
+            name="Acuerdos de Compra"
+            parent="menu_logistica_locales_bodega_central"
+            action="action_logistica_locales_acuerdos_compra"
+            groups="purchase.group_purchase_manager"
+            sequence="20"
+        />
+
+    </data>
+</odoo>

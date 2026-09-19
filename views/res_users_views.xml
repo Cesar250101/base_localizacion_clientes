@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_inherit_purchase_method" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.purchase.method</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="before">
+                <field name="activar_funcionalidades_compras_method" invisible="1"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Funcionalidades de Compras"
+                      name="method_purchase_features"
+                      attrs="{'invisible': [('activar_funcionalidades_compras_method', '=', False)]}">
+                    <group string="Ubicación de Inventario y Punto de Venta">
+                        <group>
+                            <field name="location_id" domain="[('usage', '=', 'internal')]" options="{'no_create': True}"/>
+                            <field name="pos_config_id" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
