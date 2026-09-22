@@ -31,8 +31,14 @@ class ProductPublicCategory(models.Model):
         action = self.env['ir.actions.act_window']._for_xml_id(
             'website_sale.product_template_action_website')
         action['domain'] = [('public_categ_ids', 'in', self.id)]
-        action['context'] = dict(
-            action.get('context') or {},
-            default_public_categ_ids=[(4, self.id)],
-        )
+        # El 'context' de la acción llega como string (ir.actions.act_window.context
+        # es un Char), así que se reemplaza por un dict en vez de intentar mezclarlo.
+        # Se conservan las vistas de eCommerce y se omite a propósito el
+        # search_default_published de la acción original: el contador del botón cuenta
+        # todos los productos asignados, publicados o no, y el listado debe calzar.
+        action['context'] = {
+            'default_public_categ_ids': [(4, self.id)],
+            'tree_view_ref': 'website_sale.product_template_view_tree_website_sale',
+            'kanban_view_ref': 'website_sale.product_template_view_kanban_website_sale',
+        }
         return action
