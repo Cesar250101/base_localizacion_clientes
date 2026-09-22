@@ -20,7 +20,7 @@
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Uncategorized',
-    'version': '0.6',
+    'version': '0.7',
 
     # any module necessary for this one to work correctly
     'depends': ['base',
@@ -40,7 +40,10 @@
     # Requeridos por la integración MatchPoint: sii.document_class y la
     # emisión automática del DTE en pos.order.action_pos_order_paid.
     'l10n_cl_fe',
-    'l10n_cl_dte_point_of_sale'],
+    'l10n_cl_dte_point_of_sale',
+    # Requerido por product.public.category (categorías del sitio web):
+    # botón inteligente "Productos" en su formulario.
+    'website_sale'],
 
     # always loaded
     'data': [
@@ -50,6 +53,7 @@
         'views/res_partner.xml',
         'views/templates.xml',
         'views/product_category.xml',
+        'views/product_public_category.xml',
         'views/pos_category.xml',
         'views/plates_topes.xml',
         'views/res_company.xml',

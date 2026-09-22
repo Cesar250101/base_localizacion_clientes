@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Botón inteligente con la cantidad de productos del sitio web
+             asignados directamente a la categoría (product.public.category). -->
+        <record id="base_localizacion_clientes.product_public_category_form_view" model="ir.ui.view">
+            <field name="name">base.localizacion.clientes.product.public.category.form.view</field>
+            <field name="model">product.public.category</field>
+            <field name="inherit_id" ref="website_sale.product_public_category_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//sheet/field[@name='image_1920']" position="before">
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button"
+                                name="action_view_products"
+                                type="object"
+                                icon="fa-th-list">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="product_count"/></span>
+                                <span class="o_stat_text">Productos</span>
+                            </div>
+                        </button>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
