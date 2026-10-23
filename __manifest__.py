@@ -20,7 +20,7 @@
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Uncategorized',
-    'version': '0.7',
+    'version': '0.8',
 
     # any module necessary for this one to work correctly
     'depends': ['base',
@@ -48,6 +48,7 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'security/res_partner_rule.xml',
         'data/planes_topes.xml',
         'data/matchpoint_cron.xml',
         'views/res_partner.xml',
@@ -79,6 +80,10 @@
     'demo': [
         'demo/demo.xml',
     ],
+    # BASELOCCLI-009: -i puebla partner_company_ids; la desinstalación devuelve la
+    # regla base.res_partner_rule del core (ver hooks.py).
+    'post_init_hook': 'post_init_hook',
+    'uninstall_hook': 'uninstall_hook',
     'assets': {
         'point_of_sale.assets': [
             'base_localizacion_clientes/static/src/js/pos_category_filter.js',

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- BASELOCCLI-009: la regla multicompañía de contactos del core
+         (base.res_partner_rule) solo mira company_id. Se redefine para que un
+         contacto también sea visible en cada compañía de partner_company_ids,
+         conservando partner_share y los contactos sin compañía (el dominio está
+         en PARTNER_COMPANY_RULE_DOMAIN, models/res_partner.py).
+         El registro del core es noupdate="1": un <record> aquí no se aplicaría en
+         un -u (queda ignorado), por eso se escribe con una <function>, que corre
+         en cada actualización del módulo y no hace nada si ya está al día. -->
+    <data noupdate="0">
+        <function model="res.partner" name="_update_partner_company_rule" eval="[]"/>
+    </data>
+</odoo>

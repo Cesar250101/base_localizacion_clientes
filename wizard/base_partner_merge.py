@@ -41,9 +41,18 @@ class BasePartnerMergeAutomaticWizard(models.TransientModel):
                 'company_id': dst_partner.company_id.id,
             })
 
+        # Unión de compañías (BASELOCCLI-009): el destino queda en todas las
+        # compañías de los contactos fusionados. Se calcula antes de tocar nada
+        # porque los origen se eliminan al final.
+        companies = partner_ids.mapped('partner_company_ids') | partner_ids.mapped('company_id')
+
         self._update_foreign_keys(src_partners, dst_partner)
         self._update_reference_fields(src_partners, dst_partner)
         self._update_values(src_partners, dst_partner)
+        if companies:
+            dst_partner.sudo().write({
+                'partner_company_ids': [Command.link(company.id) for company in companies],
+            })
 
         self.env.add_to_compute(dst_partner._fields['partner_share'], dst_partner)
         self._log_merge_operation(src_partners, dst_partner)
@@ -61,7 +70,7 @@ class BasePartnerMergeAutomaticWizard(models.TransientModel):
         return self._action_next_screen()
 
     def _process_query_by_company(self, query):
-        """Como _process_query pero restringe los duplicados a la company_id activa."""
+        """Como _process_query pero restringe los duplicados a la compañía activa."""
         self.ensure_one()
         model_mapping = self._compute_models()
         company_id = self.env.company.id
@@ -70,12 +79,13 @@ class BasePartnerMergeAutomaticWizard(models.TransientModel):
 
         counter = 0
         for _, aggr_ids in self._cr.fetchall():
-            # Filtrar solo los partners de la compañía activa dentro del grupo
+            # Filtrar solo los partners de la compañía activa (en su lista de
+            # compañías) o globales dentro del grupo
             partners = self.env['res.partner'].search([
                 ('id', 'in', aggr_ids),
                 '|',
-                ('company_id', '=', company_id),
-                ('company_id', '=', False),
+                ('partner_company_ids', 'in', [company_id]),
+                ('partner_company_ids', '=', False),
             ])
             if len(partners) < 2:
                 continue

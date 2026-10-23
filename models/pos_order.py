@@ -83,21 +83,22 @@ class PosOrder(models.Model):
         Partner = self.env['res.partner'].sudo()
         vat = (sale.get('customerIdent') or '').strip()
         nombre = (sale.get('customerName') or '').strip()
+        # Contactos de la compañía (en su lista de compañías) o globales
+        # (BASELOCCLI-009: un contacto puede pertenecer a varias compañías).
+        dominio_compania = [
+            '|',
+            ('partner_company_ids', 'in', [company.id]),
+            ('partner_company_ids', '=', False),
+        ]
 
         if vat:
-            partner = Partner.search([
-                ('vat', '=', vat),
-                ('company_id', 'in', [False, company.id]),
-            ], limit=1)
+            partner = Partner.search([('vat', '=', vat)] + dominio_compania, limit=1)
             if partner:
                 return partner
         if not vat and not nombre:
             return Partner.browse()
         if nombre:
-            partner = Partner.search([
-                ('name', '=ilike', nombre),
-                ('company_id', 'in', [False, company.id]),
-            ], limit=1)
+            partner = Partner.search([('name', '=ilike', nombre)] + dominio_compania, limit=1)
             if partner:
                 return partner
         if not nombre:

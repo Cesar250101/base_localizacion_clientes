@@ -15,8 +15,12 @@ Modulo de localizacion base para clientes Method en Odoo 16. Centraliza personal
 ### Contactos (`res.partner`)
 - Campo `gestioo_id` para identificador en sistema externo GestiOO.
 - Pais por defecto: Chile.
-- Campo `company_id` para soporte multi-empresa.
-- Accion masiva `action_sync_company_from_transactions`: asigna empresa a contactos sin compania revisando sus transacciones (ventas, compras, facturas, POS).
+- Campo `company_id` para soporte multi-empresa: es la compania principal del contacto (Many2one).
+- Campo `partner_company_ids` ("Companias", Many2many, tabla `res_partner_company_rel`): todas las companias del contacto. Un contacto puede pertenecer a varias; sin companias es global. La compania principal siempre esta incluida en la lista (se sincroniza en `create`/`write`). Si se quita de la lista, la principal pasa a la compania de menor id que quede; si se vacia la lista se repone; si se vacia la compania principal, el contacto vuelve a ser global.
+- La lista alimenta los dominios de la accion Contactos (`contacts.action_contacts`), de Clientes (`account.res_partner_action_customer`), el filtro "Contactos de la Compania", la regla de seguridad `base.res_partner_rule` (redefinida en `security/res_partner_rule.xml`), la busqueda MatchPoint, el dominio de proveedor de `product.supplierinfo` y el asistente de fusion de contactos (que une las companias). El webhook GestiOO y los selectores de contacto de facturas y pagos siguen usando `company_id` (la compania principal): `account.move` y `account.payment` rechazan al guardar un contacto cuya principal es otra compania, y la factura que sale de una orden del webhook es un `account.move`.
+- `-i` y la migracion 0.8 comparten `hooks.populate_partner_companies`; al desinstalar, `uninstall_hook` devuelve la regla `base.res_partner_rule` del core y limpia los dominios de las acciones de Contactos y Clientes.
+- Comportamientos a tener en cuenta: (a) cambiar la compania principal conserva la anterior en la lista (un usuario portal creado para B desde la compania 1 queda visible en ambas hasta quitar la etiqueta); (b) un contacto con lista [A, B] pero sin compania principal sigue visible en todas las companias por la regla (`company_id` vacio) y solo se oculta en las acciones; (c) la lista no se propaga a los contactos hijos.
+- Accion masiva `action_sync_company_from_transactions`: asigna empresa a contactos sin compania (y sin companias en `partner_company_ids`) revisando sus transacciones (ventas, compras, facturas, POS).
 
 ### Compania (`res.company`)
 - Campo `planes_topes_id` para vincular el plan de topes.

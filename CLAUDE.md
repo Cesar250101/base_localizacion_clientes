@@ -20,7 +20,11 @@ python odoo-bin -c odoo.conf -u base_localizacion_clientes -d <database> --stop-
 python odoo-bin -c odoo.conf -i base_localizacion_clientes -d <database> --stop-after-init
 ```
 
-There is no `tests/` directory in this module — no automated test suite to run.
+Tests live in `tests/` (`TransactionCase`). Run them against a **clone** of a database, never against a real one:
+
+```bash
+python odoo-bin -c odoo.conf -d <clone> -u base_localizacion_clientes --stop-after-init --test-tags /base_localizacion_clientes
+```
 
 The purchase-lines Excel import wizard (`wizard/import_purchase_lines_wizard.py`) requires `openpyxl`; it raises a `UserError` at runtime if the library is missing rather than failing on import.
 
@@ -42,6 +46,19 @@ When changing limit behavior, update all three. Note `pos_config.py`'s error mes
 Many models get an explicit `company_id` added on top of (or instead of) Odoo's built-in company security rules: `product.template`, `product.category`, `pos.category`, `res.partner`. The recurring domain pattern is `[('company_id', 'in', [False, current_company.id])]` (e.g. `product_template.py` `_get_company_domain()`), i.e. "global or belongs to my company."
 
 POS categories carry this further into the frontend: [models/pos_session.py](models/pos_session.py) exposes `company_id` to the loaded POS data, and the legacy POS JS module [static/src/js/pos_category_filter.js](static/src/js/pos_category_filter.js) (old `odoo.define`/`Registries` system, not OWL) filters `pos.category` records client-side by the session's company before they're loaded into the POS UI.
+
+### Partner with several companies (`partner_company_ids`, BASELOCCLI-009)
+
+`res.partner.company_id` stays a Many2one (the **main** company; its type, column and default must not change: `res.partner.bank.company_id` is `related='partner_id.company_id'`, `check_company` and core `write` assume a single company). All the contact's companies live in `partner_company_ids` (Many2many, table `res_partner_company_rel`). Empty list = global contact. A literal One2many is not possible (it needs a Many2one inverse on `res.company`).
+
+- Invariant: if `company_id` is set it is in `partner_company_ids`, kept by `res.partner.create`/`write` ([models/res_partner.py](models/res_partner.py)). Changing `company_id` adds the new one and keeps the old; clearing `company_id` (without touching the list) clears the list (global again); removing the main company from a list that keeps others moves `company_id` to the lowest-id company left; emptying the list re-adds `company_id`. The list is not propagated to child contacts.
+- Domains (`contacts.action_contacts`, `account.res_partner_action_customer`, filter `company_contacts`, `res.company._sync_contacts_action_domain`, MatchPoint `_matchpoint_find_partner`, `product.supplierinfo.partner_id`, merge wizard duplicates) use `('partner_company_ids', 'in', [company])` and `('partner_company_ids', '=', False)` for global. New code that means "contacts of the company" must do the same, not `company_id`.
+- [security/res_partner_rule.xml](security/res_partner_rule.xml) redefines core `base.res_partner_rule` through a `<function>` (`res.partner._update_partner_company_rule`, run on every `-u`; a `<record>` would be ignored because the core record is `noupdate` in `ir_model_data`) so a contact is also visible in each company of the list; `partner_share=False` and `company_id` empty keep their old behaviour.
+- Merge wizard unions the companies of the merged contacts into the destination.
+- Deliberately still on `company_id` (main company): the GestiOO webhook partner lookup ([controllers/controllers.py](controllers/controllers.py)), `account.move.partner_id` ([views/account_move.xml](views/account_move.xml)) and `account.payment.partner_id` ([models/account_payment.py](models/account_payment.py)). Only `account.move` and `account.payment` (`_check_company_auto`) validate on save that the partner's main company is the document's company; `sale.order`, `purchase.order` and `product.supplierinfo` do not. The webhook stays on `company_id` because the invoice that later comes out of its order (`account.move`) would reject a contact whose main company is another one, even if the company is in its list.
+- Install/uninstall: `post_init_hook` (`-i`; migrations only run on `-u`) and migration 0.8 share `hooks.populate_partner_companies`. `uninstall_hook` puts back the core `base.res_partner_rule` domain (otherwise every non-superuser `res.partner` search fails with `Invalid field ... partner_company_ids`) and clears the `partner_company_ids` domain / `company_contacts` default from the two core actions.
+- Known behaviours: (a) changing the main company keeps the previous one in the list, so e.g. a portal user created for B while working in company 1 stays visible in both until its tag is removed; (b) a contact with a list `[A, B]` but no main company is still visible in every company through the rule (`company_id` empty), and is only hidden in the actions; (c) the list is not propagated to child contacts.
+- Migration [migrations/0.8/post-migrate.py](migrations/0.8/post-migrate.py) copies each `company_id` into the list (idempotent).
 
 ### `allowed_company_ids` context convention
 
@@ -71,4 +88,4 @@ The **working** pattern for this divergence is `report_saleorder_document_inheri
 
 ### Partner merge override
 
-[wizard/base_partner_merge.py](wizard/base_partner_merge.py) inherits the core `base.partner.merge.automatic.wizard` to scope duplicate detection to the active company (`self.env.company.id`, partners with matching company or no company) and to let admins bypass the core 3-contact merge safety check.
+[wizard/base_partner_merge.py](wizard/base_partner_merge.py) inherits the core `base.partner.merge.automatic.wizard` to scope duplicate detection to the active company (`self.env.company.id`, partners whose `partner_company_ids` contain it or are empty) and to union the companies of the merged contacts into the destination and to let admins bypass the core 3-contact merge safety check.

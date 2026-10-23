@@ -27,6 +27,10 @@ class BaseLocalizacionClientes(http.Controller):
             if data['orden']['area_nombre'] == 'Salida':
                 vat=data['orden']['cliente_dni']
                 vat = 'CL' + vat.replace('-','').replace('-','')
+                # Se busca por compañía principal (company_id) a propósito
+                # (BASELOCCLI-009): la factura que sale de esta orden (account.move,
+                # con _check_company_auto) rechaza un contacto cuya principal sea
+                # otra compañía aunque la tenga en partner_company_ids.
                 partner_id =  request.env['res.partner'].sudo().search([('gestioo_id', '=', data['orden']['cliente_id']),
                                                                         ('company_id', '=', company.id)], limit=1)
                 if not partner_id and vat:

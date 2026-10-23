@@ -280,4 +280,9 @@ class ResCompany(models.Model):
             return
         companies = self.env['res.company'].search([])
         if len(companies) == 1:
-            action.domain = "['|', ('company_id', '=', %d), ('company_id', '=', False)]" % companies.id
+            # Con una sola compañía todos los contactos son visibles. El criterio es
+            # partner_company_ids (BASELOCCLI-009), no company_id. Solo se escribe si
+            # cambia, para que cada -u deje la acción igual.
+            domain = "['|', ('partner_company_ids', 'in', [%d]), ('partner_company_ids', '=', False)]" % companies.id
+            if action.domain != domain:
+                action.domain = domain
