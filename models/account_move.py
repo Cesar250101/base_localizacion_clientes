@@ -22,6 +22,22 @@ class AccountMove(models.Model):
         help='Nombre del contacto al momento de publicar el documento.',
     )
 
+    def _check_company(self, fnames=None):
+        """El contacto del asiento sirve si la compañía del asiento está en
+        `partner_company_ids` (BASELOCCLI-010), no solo si es su compañía principal.
+
+        El core exige partner.company_id <= move.company_id; el asiento del pago de una
+        factura de B para un contacto con principal A y lista [A, B] fallaba aquí con
+        «Empresas incompatibles con los registros». Solo cambia `partner_id`: el resto
+        de campos va a super(). Si el contacto no tiene la compañía del asiento, en vez
+        de dar el error del core se le agrega a `partner_company_ids`.
+        """
+        if fnames is None:
+            fnames = list(self._fields)
+        super()._check_company([name for name in fnames if name != 'partner_id'])
+        if 'partner_id' in fnames:
+            self.env['res.partner']._link_document_companies(self)
+
     def _post(self, soft=True):
         posted_moves = super()._post(soft=soft)
         for move in posted_moves.filtered(

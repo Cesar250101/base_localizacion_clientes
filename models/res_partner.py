@@ -52,6 +52,42 @@ class Partner(models.Model):
             return False
         return self.env.company
 
+    def _is_valid_for_company(self, company):
+        """Predicado único (BASELOCCLI-010): ¿sirve este contacto en `company`?
+
+        Sí cuando es global (sin compañía principal), cuando su compañía principal
+        es la del documento (`company_id <= company`) o cuando la compañía del
+        documento está en `partner_company_ids`. El core solo acepta los dos primeros
+        casos; lo usan `account.move` y `account.payment` en `_check_company`.
+        """
+        self.ensure_one()
+        return (
+            not self.company_id
+            or self.company_id <= company
+            or company in self.partner_company_ids
+        )
+
+    @api.model
+    def _documents_with_foreign_partner(self, documents, fname='partner_id'):
+        """Documentos cuyo contacto (campo `fname`) no sirve para su compañía.
+
+        Se lee con sudo, igual que el `_check_company` del core.
+        """
+        return documents.filtered(
+            lambda doc: doc.sudo()[fname]
+            and not doc.sudo()[fname]._is_valid_for_company(doc.company_id))
+
+    @api.model
+    def _link_document_companies(self, documents, fname='partner_id'):
+        """Agrega la compañía de cada documento al contacto que no la tiene.
+
+        En lugar de rechazar un contacto de otra compañía (BASELOCCLI-010), se suma la
+        compañía del documento a `partner_company_ids`; `company_id` (la principal) no
+        cambia. Se escribe con sudo, igual que la lectura del predicado.
+        """
+        for doc in self._documents_with_foreign_partner(documents, fname):
+            doc.sudo()[fname].write({'partner_company_ids': [Command.link(doc.company_id.id)]})
+
     def action_sync_company_from_transactions(self):
         """
         Busca todos los contactos sin compañía y les asigna una basada en sus transacciones.

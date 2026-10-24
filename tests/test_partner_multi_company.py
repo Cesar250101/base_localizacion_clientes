@@ -7,7 +7,8 @@ import json
 from unittest.mock import patch
 from xml.etree import ElementTree
 
-from odoo.exceptions import AccessError
+from odoo import Command, fields
+from odoo.exceptions import AccessError, UserError
 from odoo.modules.module import get_module_path, load_information_from_description_file
 from odoo.tests.common import HttpCase, TransactionCase
 from odoo.tools.safe_eval import safe_eval
@@ -501,6 +502,301 @@ class TestPartnerCompanyTransactionSync(PartnerMultiCompanyCase):
         self.env['res.partner'].action_sync_company_from_transactions()
         self.assertEqual(partner.company_id, self.company_c)
         self.assertIn(self.company_c, partner.partner_company_ids)
+
+
+class PartnerCompanyDocumentCase(PartnerMultiCompanyCase):
+    """Contabilidad mínima en la compañía B (cuentas, diarios, cuentas pendientes) y
+    un diario general por compañía, para no depender de un plan contable instalado.
+
+    Los documentos de prueba llevan un diario real: sin él, el display_name de un
+    registro `new` (que arma el mensaje de error) no se puede calcular.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # l10n_cl_fe llama a self.compute_name() (no existe) al publicar una factura de
+        # cliente sin tipo de documento; se neutraliza solo para estos tests.
+        patcher = patch.object(
+            cls.registry['account.move'], 'compute_name', lambda move: None, create=True)
+        patcher.start()
+        cls.addClassCleanup(patcher.stop)
+
+        company = cls.company_b
+        Account = cls.env['account.account']
+
+        def account(code, account_type, **extra):
+            return Account.create(dict(
+                code=code, name=code, account_type=account_type, company_id=company.id, **extra))
+
+        cls.receivable = account('B10R', 'asset_receivable', reconcile=True)
+        cls.payable = account('B10P', 'liability_payable', reconcile=True)
+        cls.income = account('B10I', 'income')
+        cls.expense = account('B10E', 'expense')
+        cls.bank_account = account('B10K', 'asset_cash')
+        pending_in = account('B10T', 'asset_current', reconcile=True)
+        pending_out = account('B10U', 'asset_current', reconcile=True)
+        company.write({
+            'account_journal_payment_debit_account_id': pending_in.id,
+            'account_journal_payment_credit_account_id': pending_out.id,
+        })
+        Property = cls.env['ir.property']
+        Property._set_default('property_account_receivable_id', 'res.partner', cls.receivable, company)
+        Property._set_default('property_account_payable_id', 'res.partner', cls.payable, company)
+        Journal = cls.env['account.journal']
+        cls.sale_journal = Journal.create({
+            'name': 'Ventas B10', 'code': 'SB10', 'type': 'sale', 'company_id': company.id,
+            'default_account_id': cls.income.id})
+        cls.purchase_journal = Journal.create({
+            'name': 'Compras B10', 'code': 'PB10', 'type': 'purchase', 'company_id': company.id,
+            'default_account_id': cls.expense.id})
+        cls.bank_journal = Journal.create({
+            'name': 'Banco B10', 'code': 'BB10', 'type': 'bank', 'company_id': company.id,
+            'default_account_id': cls.bank_account.id})
+        cls.account_a = Account.create({
+            'code': 'A10E', 'name': 'A10E', 'account_type': 'expense', 'company_id': cls.company_a.id})
+        cls.fiscal_position_a = cls.env['account.fiscal.position'].create({
+            'name': 'Posición fiscal A10', 'company_id': cls.company_a.id})
+        cls.general_journal = {
+            comp.id: Journal.create({
+                'name': 'General %s' % comp.name, 'code': 'G%s' % index, 'type': 'general',
+                'company_id': comp.id})
+            for index, comp in enumerate(cls.company_a | cls.company_b | cls.company_c)
+        }
+
+
+class TestPartnerCompanyPayment(PartnerCompanyDocumentCase):
+    """account.payment y account.move aceptan un contacto cuya principal es otra
+    compañía si la compañía del documento está en su lista (pagar una factura de
+    un contacto compartido; BASELOCCLI-009/010)."""
+
+    MODELS = ('account.payment', 'account.move')
+
+    def _new(self, model, partner, company, env=None, **extra):
+        record = (env or self.env)[model].new(dict(
+            journal_id=self.general_journal[company.id].id, company_id=company.id,
+            partner_id=partner.id, **extra))
+        self.assertEqual(record.company_id, company)
+        return record
+
+    def _check(self, partner, company, model='account.payment', fnames=('partner_id',)):
+        self._new(model, partner, company)._check_company(list(fnames))
+
+    def _global_partner(self, name):
+        return self.env['res.partner'].with_context(creating_from_company=True).create({'name': name})
+
+    def test_partner_with_company_in_list_is_accepted(self):
+        partner = self._partner('Pago B+A', self.company_b, self.company_a | self.company_b)
+        for model in self.MODELS:
+            self._check(partner, self.company_a, model)
+            self._check(partner, self.company_b, model)
+
+    def test_partner_main_company_is_accepted(self):
+        partner = self._partner('Pago A', self.company_a)
+        for model in self.MODELS:
+            self._check(partner, self.company_a, model)
+
+    def test_global_partner_is_accepted(self):
+        partner = self._global_partner('Pago global')
+        for model in self.MODELS:
+            self._check(partner, self.company_a, model)
+
+    def _assert_linked(self, partner, company):
+        # Un contacto sin la compañía del documento ya no se rechaza: se le agrega a
+        # partner_company_ids y la principal no cambia.
+        main = partner.company_id
+        for model in self.MODELS:
+            partner.write({'partner_company_ids': [Command.unlink(company.id)]})
+            self.assertNotIn(company, partner.partner_company_ids, model)
+            self._check(partner, company, model)
+            self.assertIn(company, partner.partner_company_ids, model)
+            self.assertEqual(partner.company_id, main, model)
+
+    def test_partner_without_company_in_list_is_linked(self):
+        self._assert_linked(self._partner('Pago A', self.company_a), self.company_b)
+
+    def test_partner_with_other_companies_in_list_is_linked(self):
+        partner = self._partner('Pago C+A', self.company_c, self.company_c | self.company_a)
+        self._assert_linked(partner, self.company_b)
+        self.assertEqual(partner.partner_company_ids, self.company_a | self.company_b | self.company_c)
+
+    def test_partner_with_main_company_but_empty_list_is_linked(self):
+        # Dato heredado: principal A sin fila en la lista. No es global ni tiene a B.
+        partner = self._partner('Pago A sin lista', self.company_a)
+        self.env.cr.execute("DELETE FROM res_partner_company_rel WHERE partner_id = %s", (partner.id,))
+        self.env.invalidate_all()
+        self.assertFalse(partner.partner_company_ids)
+        self._check(partner, self.company_b)
+        self.assertIn(self.company_b, partner.partner_company_ids)
+
+    def test_valid_partner_is_not_written(self):
+        partner = self._partner('Sin cambios', self.company_a, self.company_a | self.company_b)
+        for model in self.MODELS:
+            self._check(partner, self.company_b, model)
+        self.assertEqual(partner.partner_company_ids, self.company_a | self.company_b)
+
+    def test_predicate_is_the_single_source_of_truth(self):
+        partner_ab = self._partner('Pred A+B', self.company_a, self.company_a | self.company_b)
+        partner_a = self._partner('Pred A', self.company_a)
+        partner_global = self._global_partner('Pred global')
+        self.assertTrue(partner_ab._is_valid_for_company(self.company_a))
+        self.assertTrue(partner_ab._is_valid_for_company(self.company_b))
+        self.assertFalse(partner_ab._is_valid_for_company(self.company_c))
+        self.assertTrue(partner_a._is_valid_for_company(self.company_a))
+        self.assertFalse(partner_a._is_valid_for_company(self.company_b))
+        self.assertTrue(partner_global._is_valid_for_company(self.company_c))
+        documents = self._new('account.payment', partner_a, self.company_b)
+        Partner = self.env['res.partner']
+        self.assertEqual(Partner._documents_with_foreign_partner(documents), documents)
+        documents.partner_id = partner_ab
+        self.assertFalse(Partner._documents_with_foreign_partner(documents))
+
+    def test_only_partner_id_is_relaxed(self):
+        # Otro campo check_company con un registro de otra compañía sigue fallando con
+        # el error del core, y el error nombra ese campo, no el contacto.
+        partner = self._partner('Solo partner', self.company_a, self.company_a | self.company_b)
+        foreign = {
+            'account.payment': ('destination_account_id', self.account_a),
+            'account.move': ('fiscal_position_id', self.fiscal_position_a),
+        }
+        for model, (fname, value) in foreign.items():
+            # El contacto compartido por sí solo pasa...
+            self._new(model, partner, self.company_b)._check_company()
+            # ...pero un registro de A en un documento de B sigue fallando.
+            record = self._new(model, partner, self.company_b, **{fname: value.id})
+            with self.assertRaises(UserError, msg=model) as error:
+                record._check_company()
+            message = str(error.exception)
+            self.assertIn('(%s:' % fname, message, model)
+            self.assertNotIn('partner_id', message, model)
+
+    def test_default_fnames_checks_every_field(self):
+        # Sin fnames se valida todo: el contacto compartido pasa.
+        partner = self._partner('Todos', self.company_a, self.company_a | self.company_b)
+        for model in self.MODELS:
+            self._new(model, partner, self.company_b)._check_company()
+
+    def test_recordset_links_only_missing_documents(self):
+        good = self._partner('Lote bueno', self.company_a, self.company_a | self.company_b)
+        bad = self._partner('Lote malo', self.company_c)
+        payments = self._new('account.payment', good, self.company_b)             | self._new('account.payment', bad, self.company_b)
+        payments._check_company(['partner_id'])
+        self.assertEqual(good.partner_company_ids, self.company_a | self.company_b)
+        self.assertEqual(bad.partner_company_ids, self.company_b | self.company_c)
+
+
+class TestPartnerCompanyPaymentFlow(PartnerCompanyDocumentCase):
+    """BASELOCCLI-010: wizard de pago -> pago -> asiento -> action_post -> conciliación
+    de una factura de la compañía B para un contacto cuya principal es A.
+
+    La contabilidad mínima de B sale de PartnerCompanyDocumentCase.
+    """
+
+    def _invoice(self, move_type, partner):
+        out = move_type == 'out_invoice'
+        move = self.env['account.move'].with_company(self.company_b).create({
+            'move_type': move_type,
+            'partner_id': partner.id,
+            'invoice_date': fields.Date.today(),
+            'journal_id': (self.sale_journal if out else self.purchase_journal).id,
+            'ref': 'BASELOCCLI-010-%s' % move_type,
+            'invoice_line_ids': [(0, 0, {
+                'name': 'Línea',
+                'quantity': 1,
+                'price_unit': 100.0,
+                'account_id': (self.income if out else self.expense).id,
+                'tax_ids': [(5,)],
+            })],
+        })
+        move.action_post()
+        self.assertEqual(move.state, 'posted')
+        return move
+
+    def _register_payment(self, invoice):
+        wizard = self.env['account.payment.register'].with_company(self.company_b).with_context(
+            active_model='account.move', active_ids=invoice.ids).create({})
+        action = wizard.action_create_payments()
+        return self.env['account.payment'].browse(action['res_id'])
+
+    def _assert_paid(self, invoice, payment, partner, payment_type):
+        self.assertEqual(payment.state, 'posted')
+        self.assertEqual(payment.move_id.state, 'posted')
+        self.assertEqual(payment.payment_type, payment_type)
+        self.assertEqual(payment.partner_id, partner)
+        self.assertEqual(payment.move_id.partner_id, partner)
+        self.assertEqual(payment.company_id, self.company_b)
+        self.assertIn(invoice.payment_state, ('paid', 'in_payment'))
+        self.assertFalse(invoice.amount_residual)
+        # Cualquier otra validación check_company del flujo (líneas, conciliación).
+        payment._check_company()
+        invoice._check_company()
+        payment.move_id._check_company()
+        payment.move_id.line_ids._check_company()
+        invoice.line_ids._check_company()
+        self.env['account.partial.reconcile'].search(
+            [('debit_move_id', 'in', invoice.line_ids.ids)])._check_company()
+
+    def test_customer_invoice_of_b_for_partner_with_main_company_a(self):
+        partner = self._partner('Cliente A+B', self.company_a, self.company_a | self.company_b)
+        invoice = self._invoice('out_invoice', partner)
+        payment = self._register_payment(invoice)
+        self._assert_paid(invoice, payment, partner, 'inbound')
+
+    def test_vendor_bill_of_b_for_partner_with_main_company_a(self):
+        partner = self._partner('Proveedor A+B', self.company_a, self.company_a | self.company_b)
+        invoice = self._invoice('in_invoice', partner)
+        payment = self._register_payment(invoice)
+        self._assert_paid(invoice, payment, partner, 'outbound')
+
+    def test_global_partner_still_pays(self):
+        partner = self.env['res.partner'].with_context(creating_from_company=True).create(
+            {'name': 'Cliente global'})
+        for move_type, payment_type in (('out_invoice', 'inbound'), ('in_invoice', 'outbound')):
+            invoice = self._invoice(move_type, partner)
+            self._assert_paid(invoice, self._register_payment(invoice), partner, payment_type)
+
+    def test_partner_with_main_company_b_still_pays(self):
+        partner = self._partner('Cliente B', self.company_b)
+        for move_type, payment_type in (('out_invoice', 'inbound'), ('in_invoice', 'outbound')):
+            invoice = self._invoice(move_type, partner)
+            self._assert_paid(invoice, self._register_payment(invoice), partner, payment_type)
+
+    def test_partner_whose_list_lost_company_b_is_rejected(self):
+        partner = self._partner('Cliente sale de B', self.company_a, self.company_a | self.company_b)
+        invoice = self._invoice('out_invoice', partner)
+        partner.write({'partner_company_ids': [(6, 0, self.company_a.ids)]})
+        self.assertEqual(partner.partner_company_ids, self.company_a)
+        with self.assertRaises(UserError) as error:
+            self._register_payment(invoice)
+        self.assertIn('(partner_id:', str(error.exception))
+        self.assertEqual(invoice.payment_state, 'not_paid')
+
+    def test_partner_with_main_company_a_and_no_list_is_rejected(self):
+        partner = self._partner('Cliente A heredado', self.company_a, self.company_a | self.company_b)
+        invoice = self._invoice('in_invoice', partner)
+        self.env.cr.execute("DELETE FROM res_partner_company_rel WHERE partner_id = %s", (partner.id,))
+        self.env.invalidate_all()
+        self.assertFalse(partner.partner_company_ids)
+        with self.assertRaises(UserError) as error:
+            self._register_payment(invoice)
+        self.assertIn('(partner_id:', str(error.exception))
+
+    def test_move_of_b_for_partner_without_b_in_list_is_rejected(self):
+        partner = self._partner('Solo A', self.company_a)
+        with self.assertRaises(UserError) as error:
+            self._invoice('out_invoice', partner)
+        self.assertIn('(partner_id:', str(error.exception))
+
+    def test_journal_of_other_company_is_still_rejected_in_the_flow(self):
+        partner = self._partner('Cliente diario', self.company_a, self.company_a | self.company_b)
+        journal_a = self.env['account.journal'].create({
+            'name': 'Diario A flujo', 'code': 'JA11', 'type': 'general', 'company_id': self.company_a.id})
+        with self.assertRaises(UserError) as error:
+            self.env['account.move'].with_company(self.company_b).create({
+                'move_type': 'entry', 'partner_id': partner.id, 'journal_id': journal_a.id,
+                'company_id': self.company_b.id})
+        self.assertIn('journal_id', str(error.exception))
+        self.assertNotIn('partner_id', str(error.exception))
 
 
 class TestPartnerCompanyGestiooWebhook(HttpCase):
